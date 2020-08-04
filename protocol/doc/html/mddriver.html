@@ -1,0 +1,279 @@
+<p><center>
+<img src="../images/mddriverlogo.png" alt="logo" title="MDDriver logo">
+</center></p>
+
+<h1>Introduction</h1>
+
+<p>MDDriver is a library allowing a user to easily couple 
+molecular visualisation tools with simulation code through 
+a network. This enables a user to perform interactive molecular dynamics, by visualizing 
+simulation results and driving the simulation in interactive time.</p>
+
+<h1>Installation  of MDDRIVER</h1>
+
+<h2>Tools required</h2>
+
+<ul>
+<li><a href="http://www.cmake.org" title="(http://www.cmake.org">CMake</a></li>
+</ul>
+
+<h2>Optional tools (for using MDDriver with <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a>)</h2>
+
+<ul>
+<li>a specific patched version of <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a> (cvs date 2007-12-08 for parallel runs, or 4.0.5 for mono-processor jobs)</li>
+<li>the <a href="http://www.fftw.org/" title="http://www.fftw.org/">fftw3 library</a> for compiling <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a></li>
+<li>the <a href="http://www.ks.uiuc.edu/Research/vmd/" title="http://www.ks.uiuc.edu/Research/vmd/">VMD visualization tool</a>  (see below)</li>
+</ul>
+
+<h2>Compiling and Installing MDDriver (for MacOSX and linux)</h2>
+
+<ol>
+<li><p>Download MDDriver</p>
+
+<p>We advise you to get the latest version from svn, and put it in the ${MDDRIVER_SRC} directory: </p>
+
+<pre><code>svn co https://mddriver.svn.sourceforge.net/svnroot/mddriver ${MDDRIVER_SRC}
+</code></pre>
+
+<p>You can also get an MDDriver tarball from sourceforge  <a href="http://downloads.sourceforge.net/mddriver/mddriver.tar.gz" title="http://downloads.sourceforge.net/mddriver/mddriver.tar.gz">via this link</a></p></li>
+<li><p>Then decompress MDDriver</p>
+
+<pre><code>tar xzvf mddriver.tar.gz
+</code></pre>
+
+<p>This creates the mddriver source directory. In the next parts, we will refer to the absolute 
+path of this directory as MDDRIVER_SRC. So please replace it by your own path: for example it could be defined as /home/martin/mddriver via the following command</p>
+
+<pre><code>export MDDRIVER_SRC=/home/martin/mddriver (for bash)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>setenv MDDRIVER_SRC /home/martin/mddriver (for csh)
+</code></pre></li>
+<li><p>Compile and install MDDriver</p>
+
+<pre><code>mkdir MDDriverBuild
+cd MDDriverBuild
+cmake ${MDDRIVER_SRC}
+make install (you have to be root)
+</code></pre>
+
+<p>This will install MDDriver in the default directory determined by the install prefix (/usr/local, be careful you might need to be root).  You can also install MDDriver on your own install prefix (for example /home/martin) using this way : </p>
+
+<pre><code>mkdir MDDriverBuild
+cd MDDriverBuild
+cmake ${MDDRIVER_SRC} -DCMAKE_INSTALL_PREFIX:PATH=/home/martin
+make install
+</code></pre></li>
+<li><p>Be careful, you must have the environment variables MDDRIVER_PATH, MDDRIVER_DATA_PATH, MDDRIVER_DIR, MDDRIVER_LIBRARY_DIR, and MDDRIVER_INCLUDE_DIR set in order to be able to continue. To do so, source the MDDriver settings script located in the bin subdirectory of the MDDriver install directory.</p>
+
+<pre><code>source MDDriver-config.sh (for bash)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>source MDDriver-config.csh (for csh)
+</code></pre></li>
+</ol>
+
+<h2>Testing MDDriver</h2>
+
+<p>Before using MDDriver, you should test it using a test server and a test client which communicate with each other.
+For this you will need two terminals. In the first, type: </p>
+
+<pre><code>    cd ${MDDRIVER_PATH}
+    ./servertest
+</code></pre>
+
+<p>and in the second console :</p>
+
+<pre><code>    cd ${MDDRIVER_PATH}
+   ./clienttest
+</code></pre>
+
+<p>You should see energy and coordinate exchange between the server and the client. </p>
+
+<p>NB: You could have the following error message when you launch the clienttest script:</p>
+
+<pre><code>  MDDriver &gt;      Unknown endian machine - disconnecting
+  MDDriver &gt; ---- Leaving     iimd_init
+  MDDriver &gt; ---- Entering in iimd_probeconnection
+  MDDriver &gt; ---- Leaving     iimd_probeconnection
+  MDDriver &gt; ---- Entering in iimd_init
+</code></pre>
+
+<p>Don't worry, it could be due to a port problem. Try to fix the problem (e.g. the hostname must be "localhost" and the port 3000) in changing the port and hostname in the file: mddriver/src/clienttest.c by the hostname and port obtained when launching ./servertest.</p>
+
+<h2>Installing <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a> with MDDriver support:</h2>
+
+<ol>
+<li><p>Before installing <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a>, you have to install <a href="http://www.fftw.org/" title="http://www.fftw.org/">FFTW3</a></p>
+
+<pre><code>apt-get install fftw3 (for linux)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>fink install fftw3 (For MacOS X)
+</code></pre></li>
+</ol>
+
+<p>You can also go to the <a href="http://www.fftw.org/" title="http://www.fftw.org/">FFTW3 website</a> for downloading and compiling from source.</p>
+
+<ol>
+<li><p>Getting specific source of <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a></p>
+
+<p>Then you have two options for obtaining the specific source code version of Gromacs which was
+used for MDDriver development. Both options will create a new gmx directory at your current path.</p>
+
+<ul>
+<li><p>Option 1 : using CVS: </p>
+
+<pre><code>cvs -z3 -d :pserver:anoncvs@cvs.GROMACS.org:/home/gmx/cvs login         (no password)
+cvs -z3 -d :pserver:anoncvs@cvs.GROMACS.org:/home/gmx/cvs co -D "2007-12-08" gmx
+</code></pre></li>
+<li><p>Option 2 : use our snapshot gmx-cvs-2007-12-08.tar.gz: </p>
+
+<ul>
+<li><p><a href="http://downloads.sourceforge.net/mddriver/gmx-cvs-2007-12-08.tar.gz" title="http://downloads.sourceforge.net/mddriver/gmx-cvs-2007-12-08.tar.gz">Download gmx-cvs-2007-12-08.tar.gz</a>, then do</p>
+
+<pre><code> tar xzvf gmx-cvs-2007-12-08.tar.gz
+</code></pre></li>
+</ul></li>
+</ul></li>
+<li><p>Patch the <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a> source code for MDDriver :</p>
+
+<p>In the next parts we will refer to GROMACS_DIR as the absolute path where the Gromacs source code was copied (GROMACS_DIR=/home/martin/gmx for example).
+THE GROMACS_DIR VARIABLE MUST BE SET IN ORDER TO APPLY THE PATCH IN THE NEXT PART.</p>
+
+<pre><code>    export GROMACS_DIR=/home/martin/gmx (bash)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>    setenv GROMACS_DIR /home/martin/gmx (csh)
+</code></pre>
+
+<p>then</p>
+
+<pre><code>    cd ${MDDRIVER_DIR}/../adapters/simulation/gmx-cvs-2007-12-08
+    cmake .
+    make
+    make install
+</code></pre></li>
+<li><p>Compiling the <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a> source code with MDDriver: </p>
+
+<p>The GROMACS binaries, includes and libraries will be installed in /usr/local/gromacs, but if you want to install <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a> binaries and includes in a user defined path (${GMXINSTALLPATH}), you have to 
+change the prefix via the configure script (./configure --help) . For MPI support with <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a>, you have to enable MPI and should change the executable suffix for convenience.</p>
+
+<pre><code>    cd ${GROMACS_DIR}
+    ./bootstrap (if needed)
+</code></pre>
+
+<p>NB: the bootstrap script just launches commands such as aclocal or automake. Sometimes it is necessary to change the version of these programs. To do that, you just need to edit the bootstrap file and add the version information (-X.X) after the actual command names (where it is necessary).</p>
+
+<ul>
+<li><p>For a linux machine (or if you don't use fink)</p>
+
+<pre><code>CPPFLAGS="-DGMX_MDDRIVER -I${MDDRIVER_INCLUDE_DIR}" LDFLAGS="-L${MDDRIVER_LIBRARY_DIR}" ./configure --enable-all-static --without-x --enable-float [--prefix=${GMXINSTALLPATH}] [--enable-mpi --program-suffix=_mpi]
+</code></pre></li>
+<li><p>For Mac OS X using fink, you have to set a non standard fink library and include its location before calling the configure script : </p>
+
+<pre><code>CPPFLAGS="-I/sw/include -DGMX_MDDRIVER -I${MDDRIVER_INCLUDE_DIR}" LDFLAGS="-L/sw/lib -L${MDDRIVER_LIBRARY_DIR} "  ./configure --enable-all-static --without-x --enable-float [--prefix=$GMXINSTALLPATH] [--enable-mpi --program-suffix=_mpi]
+</code></pre>
+
+<p>NB: texts between brackets are optional. Do not type this text if you don't want to use the option, or just remove the brackets and add to the configure command line to use them.   </p></li>
+</ul>
+
+<p>Then just type:</p>
+
+<pre><code>    make
+    make install (maybe you have to be root)
+</code></pre></li>
+<li><p>Remarks about GROMACS 4 (parallel runs not yet supported!)</p>
+
+<p>You can also use the GROMACS version 4.0.5, by downloading it on the <a href="http://www.gromacs.org" title="http://www.gromacs.org">GROMACS</a>  website, 
+or by getting it on the <a href="http://downloads.sourceforge.net/mddriver/gromacs-4.0.5.tar.gz" title="http://downloads.sourceforge.net/mddriver/gromacs-4.0.5.tar.gz">MDDriver sourceforge site</a>.  The same patching procedure has to be 
+applied to the GROMACS version 4.0.5, using the path located in the ${MDDRIVER_DIR}/../adapters/simulation/gromacs-4.0.5 directory 
+instead of ${MDDRIVER_DIR}/../adapters/simulation/gmx-cvs-2007-12-08.</p>
+
+<p>AS OF NOW (JULY 2009), THE GROMACS 4.0.5 MPI VERSION DOES NOT WORK WITH MDDRIVER. YOU CAN CURRENTLY ONLY USE IT SEQUENTIALLY (MONO-PROCESSOR JOBS).</p></li>
+</ol>
+
+<p>Finally, we suggest to add the Gromacs binary to your PATH :</p>
+
+<pre><code>        export PATH=${PATH}:${GMXINSTALLPATH}/bin (for bash)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>        setenv PATH ${PATH}:${GMXINSTALLPATH}/bin (for csh or tcsh)
+</code></pre>
+
+<p>Or to source the GMXRC scripts (maybe in your .bashrc):</p>
+
+<pre><code>        source ${GMXINSTALLPATH}/bin/GNXRC.bash (for bash)
+</code></pre>
+
+<p>or</p>
+
+<pre><code>        source ${GMXINSTALLPATH}/bin/GNXRC.csh (for csh or tcsh)
+</code></pre>
+
+<h1>Interacting with a GROMACS simulation via VMD using MDDriver</h1>
+
+<h2>Lauching the simulation:</h2>
+
+<ol>
+<li><p><a href="http://www.ks.uiuc.edu/Research/vmd/" title="http://www.ks.uiuc.edu/Research/vmd/">Download VMD</a>.</p></li>
+<li><p>Go to the data directory, then choose one of the example subdirectories: </p>
+
+<pre><code>cd ${MDDRIVERDIR}/data/02_peptide_200
+</code></pre></li>
+<li><p>First you have to convert the molecular description of the molecular system in the pdb file model.pdb and prepare the simulation input for Gromacs :</p>
+
+<pre><code>pdb2gmx -f model.pdb -o model.gro -p model.top
+mkdir output
+grompp -f imd.mdp -c model.gro -p model.top -o model.tpr
+</code></pre></li>
+<li><p>Then you can run the simulation, providing Gromacs with parameters for MDDriver. The parameter IMDfreq is the number of timesteps between two MDDriver exchanges. When IMDwait is set to 1 this means that the simulation will wait for a client connection before starting, The parameter IMDport is the port on which data wil be sent and IMDmsg sets the log level, from 0 for no messages to 3 for verbose logging (be careful to use the mdrun executable compiled with MDDriver).</p>
+
+<pre><code>mdrun -IMDfreq 1 -IMDwait 1 -IMDport 3000 -IMDmsg 1 -s model.tpr -x output/imd -deffnm output/imd
+</code></pre>
+
+<p>If you use an MPI version of Gromacs/MDDriver, pay attention to execute Gromacs with the same MPI version as it was compiled with!</p></li>
+</ol>
+
+<h2>Lauching VMD :</h2>
+
+<p>Start the VMD program (double click on its icon or launch from the command line).</p>
+
+<ul>
+<li>Open the description of the molecular system in the pdb file model.pdb that you have used for the simulation : </li>
+</ul>
+
+<p><center>
+<img src="../images/vmd1.png" alt="vmdsnap1" title="Open PDB file">
+</center></p>
+
+<ul>
+<li>Connect VMD to the running simulation, specifying host name and port number on which the simulation was launched, then click connect. 
+<center>
+<img src="../images/vmd2.png" alt="vmdsnap2" title="Connect to the simulation">
+</center></li>
+</ul>
+
+<h2>Interact with the scene, using VMD tools: </h2>
+
+<p>In a low VR Context (no haptic devices, only the Mouse available) go to the menu Mouse>Force and choose a selection mode (atom, residue, fragment). Then you can pick atoms (residues or fragments) in the rendering window and influence the running simulation by applying additional user-defined forces. For a higher VR context (with a haptic device for example), first lauch the VRPN server managing your VR device, then define a .vmdsensor file to configure your device (you might have to restart VMD when you change this file), and finally you can use the Graphics>Tools menu to define the interaction mode of your device with the simulation.</p>
+
+<h2>The end!</h2>
+
+<p>We hope you enjoy interactive simulations vie MDDriver and please let us know about your applications and discoveries!</p>
+
+<h1>Copyright and License</h1>
+
+<p>This program is under the <a href="http://www.cecill.info/index.en.html" title="CeCill licence">CeCill licence</a>, which is compatible with the GPL licence.</p>
+
+<!-- REFERENCES -->
