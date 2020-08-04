@@ -27,14 +27,9 @@ Compiling and Installing MDDriver (for MacOSX and linux)
 --------------------------------------------------------
 1. Get MDDriver 
 
-    We advice you to get the last version on svn, and put it in the ${MDDRIVER\_SRC} directory: 
+    We advice you to get the last version on github, and put it in the ${MDDRIVER\_SRC} directory: 
         
-        svn co https://mddriver.svn.sourceforge.net/svnroot/mddriver ${MDDRIVER_SRC}
-        	
-    You can also get MDDriver on sourceforge :  	
-        
-        [http://downloads.sourceforge.net/mddriver/mddriver.tar.gz](http://downloads.sourceforge.net/mddriver/mddriver.tar.gz)
-        tar xzvf mddriver.tar.gz
+        git clone https://github.com/LBT-CNRS/MDDriverr ${MDDRIVER_SRC}
         
     This creates the mddriver source directory. In the next parts, we named MDDRIVER\_SRC the absolute 
     path of this source directory (MDDRIVER\_SRC=/home/martin/mddriver for example). 
