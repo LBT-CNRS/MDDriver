@@ -25,7 +25,7 @@
 
 #if defined(VMDSOCKINTERNAL)
 
-	#if !defined(_MSC_VER)
+	#if !defined(_WIN32)
 		#include <unistd.h>
 		#include <sys/types.h>
 		#include <sys/socket.h>

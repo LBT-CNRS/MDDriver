@@ -65,7 +65,7 @@
  
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(_MSC_VER) 
+#if defined(_WIN32) 
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -89,7 +89,7 @@ const double NmToAngstrom     = 10.0;
 typedef float t_coord[3];
 
 // Return a non zero value if a keyboard event occurs
-#if !defined(_MSC_VER) 
+#if !defined(_WIN32) 
 int keyboard_event()
 	{
 	struct timeval tv;
@@ -164,7 +164,7 @@ int main()
 	while ( ! IIMD_probeconnection()) 
 		{
 		MYIMDlog =  IIMD_init( hostname, &mode,&wait, &port, &IMDmsg , 0 );
-		#if defined(_MSC_VER) 
+		#if defined(_WIN32) 
 			Sleep(500);
 		#else
 			usleep(500000);
@@ -255,7 +255,7 @@ int main()
 				(const float *) forces_list ); 
 				}
 			}
-		#if !defined(_MSC_VER) 
+		#if !defined(_WIN32) 
 		// Deals with keyboard events
 		if ( keyboard_event() ) 
 			{

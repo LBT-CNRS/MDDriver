@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_MSC_VER) 
+#if defined(_WIN32) 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
@@ -51,7 +51,7 @@
 
 int vmdsock_init(void) 
 	{
-	#if defined(_MSC_VER)
+	#if defined(_WIN32)
 		int rc = 0;
 		static int initialized=0;
 
@@ -175,7 +175,7 @@ void *vmdsock_accept(void * v)
 int  vmdsock_write(void * v, const void *buf, int len) 
 	{
 	vmdsocket *s = (vmdsocket *) v;
-	#if defined(_MSC_VER)
+	#if defined(_WIN32)
 		return send(s->sd, (const char*) buf, len, 0);  // windows lacks the write() call
 	#else
 		return write(s->sd, buf, len);
@@ -185,7 +185,7 @@ int  vmdsock_write(void * v, const void *buf, int len)
 int  vmdsock_read(void * v, void *buf, int len) 
 	{
 	vmdsocket *s = (vmdsocket *) v;
-	#if defined(_MSC_VER)
+	#if defined(_WIN32)
 		return recv(s->sd, (char*) buf, len, 0); // windows lacks the read() call
 	#else
 		return read(s->sd, buf, len);
@@ -198,7 +198,7 @@ void vmdsock_shutdown(void *v)
 	if (s == NULL)
 		return;
 
-	#if defined(_MSC_VER)
+	#if defined(_WIN32)
 		shutdown(s->sd, SD_SEND);
 	#else
 		shutdown(s->sd, 1);  /* complete sends and send FIN */
@@ -211,7 +211,7 @@ void vmdsock_destroy(void * v)
 	if (s == NULL)
 		return;
 
-	#if defined(_MSC_VER)
+	#if defined(_WIN32)
 		closesocket(s->sd);
 	#else
 		close(s->sd);

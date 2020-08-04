@@ -62,6 +62,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	SET(CMAKE_C_FLAGS "-D__LINUX__")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+IF(WIN32)
+    link_libraries(ws2_32 wsock32)
+ENDIF()
+
 
 # by default, we'll be installing mddriver in /some/standard/path/MDDriver
 #IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

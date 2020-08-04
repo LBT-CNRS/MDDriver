@@ -63,7 +63,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <Windows.h>
 #else
 #include <unistd.h>
@@ -149,7 +149,7 @@ void my_calculation(float coords[][NDIM])
 	{ // --- our "calculation" is just a shift in y direction ---
 	int i=0;
 	for (i=0; i< N; i++) coords[i][1] += 0.05;
-		#if defined(_MSC_VER) 
+		#if defined(_WIN32) 
 			Sleep(1000);
 		#else
 			sleep(1);

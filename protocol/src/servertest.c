@@ -66,7 +66,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <Windows.h>
 #else
 #include <unistd.h>
@@ -444,7 +444,7 @@ void my_calculation(float coord_out[][NDIM])
 		}
 
 	// Control the "speed" of the calculation
-	#if defined(_MSC_VER)
+	#if defined(_WIN32)
 		Sleep(1);	
 	#else
 		usleep(1000);

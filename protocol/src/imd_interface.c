@@ -69,7 +69,7 @@
 #include "vmdsock.h"
 #include <stdlib.h>
 #include <string.h>
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 	#include <Windows.h>
 #else
 	#include <unistd.h>
@@ -246,7 +246,7 @@ static int find_free_port(void *sock, const char* hostname, int defport)
 			return port;
 	return -1;
 	}
-#elif defined(_MSC_VER)
+#elif defined(_WIN32)
 static int find_free_port(void *sock, const char* hostname, int defport) 
 {
 	int port;
@@ -992,7 +992,7 @@ void IIMD_send_pause()
 		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__); 
 
 	imd_pause( sock );
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 	Sleep(1);
 #else
 	sleep(1);
