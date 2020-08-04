@@ -662,11 +662,11 @@ FILE *IIMD_init( const char  *hostname, 	imd_int32   *mode,	imd_int32   *IMDwait
 		IMDignore =  1;
 		}
 	sock = vmdsock_create();
+	IMDport = *IMDport_;
 	// Server Mode
 	if ( *mode ) 
 		{
 		IMDserver = 1;
-		IMDport = *IMDport_;    
 		if ( IMDport  > 1024 ) 
 			{
 			IMDport   = IMDport;
