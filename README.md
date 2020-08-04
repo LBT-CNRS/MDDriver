@@ -4,7 +4,7 @@ MDDriver is a library allowing a user to easily couple molecular visualisation t
 
 The previous [sourceforge repository](https://sourceforge.net/projects/mddriver/) is now deprecated and the latest version is on github.
 
-[Video](https://www.youtube-nocookie.com/embed/tHGXYcgRqc8)
+[![](https://img.youtube.com/vi/tHGXYcgRqc8/0.jpg)](https://www.youtube-nocookie.com/embed/tHGXYcgRqc8)
 ![](https://a.fsdn.com/con/app/proj/mddriver/screenshots/page16-1008-full.jpg/245/183/1.5)
 ![](https://a.fsdn.com/con/app/proj/mddriver/screenshots/page16-1000-full.jpg/245/183/1.5)
 ![](https://a.fsdn.com/con/app/proj/mddriver/screenshots/page16-1004-full.jpg/245/183/1.5)
