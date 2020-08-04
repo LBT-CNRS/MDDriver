@@ -52,7 +52,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	SET(CMAKE_C_FLAGS "-D__MACOSX__")
-	SET(CMAKE_C_FLAGS "-arch i386 -arch ppc -arch x86_64  -D__MACOSX__")
+	SET(CMAKE_C_FLAGS "-arch x86_64  -D__MACOSX__")
 	#SET(CMAKE_C_FLAGS "-arch i386 -arch ppc -arch x86_64 -mmacosx-version-min=10.6  -D__MACOSX__")	
 	#SET(CMAKE_OSX_SYSROOT /Developer/SDKs/MacOSX10.6.sdk)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
