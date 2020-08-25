@@ -26,32 +26,32 @@
 * interactive simulations. This software is governed by the CeCILL-C license
 * under French law and abiding by the rules of distribution of free software.
 * You can use, modify and/or redistribute the software under the terms of the
-* CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL 
+* CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL
 * “http://www.cecill.info”.
-* 
-* As a counterpart to the access to the source code and rights to copy, 
-* modify and redistribute granted by the license, users are provided only 
-* with a limited warranty and the software’s author, the holder of the 
-* economic rights, and the successive licensors have only limited 
+*
+* As a counterpart to the access to the source code and rights to copy,
+* modify and redistribute granted by the license, users are provided only
+* with a limited warranty and the software’s author, the holder of the
+* economic rights, and the successive licensors have only limited
 * liability.
 *
-* In this respect, the user’s attention is drawn to the risks associated 
-* with loading, using, modifying and/or developing or reproducing the 
-* software by the user in light of its specific status of free software, 
-* that may mean that it is complicated to manipulate, and that also 
-* therefore means that it is reserved for developers and experienced 
-* professionals having in-depth computer knowledge. Users are therefore 
-* encouraged to load and test the software’s suitability as regards their 
-* requirements in conditions enabling the security of their systems and/or 
-* data to be ensured and, more generally, to use and operate it in the 
+* In this respect, the user’s attention is drawn to the risks associated
+* with loading, using, modifying and/or developing or reproducing the
+* software by the user in light of its specific status of free software,
+* that may mean that it is complicated to manipulate, and that also
+* therefore means that it is reserved for developers and experienced
+* professionals having in-depth computer knowledge. Users are therefore
+* encouraged to load and test the software’s suitability as regards their
+* requirements in conditions enabling the security of their systems and/or
+* data to be ensured and, more generally, to use and operate it in the
 * same conditions as regards security.
 *
-* The fact that you are presently reading this means that you have had 
+* The fact that you are presently reading this means that you have had
 * knowledge of the CeCILL-C license and that you accept its terms.
 *
 *
-* References : 
-* If you use this code, could you please cite one of these references : 	
+* References :
+* If you use this code, could you please cite one of these references :
 * O. Delalande, N. Ferey, G. Grasseau and M. Baaden : "Complex Molecular Assemblies at hand via Interactive Simulations", 2009, Journal of Computational Chemistry 2009.
 * N. Ferey, O. Delalande, G. Grasseau and M. Baaden : "A VR framework for interacting with molecular simulations", 2008, in proceedings of ACM symposium on Virtual reality software and technology (ACM - VRST'08).
 *
@@ -73,7 +73,7 @@
 #define N 6
 #define NDIM 3
 
-float coords[N][NDIM] = 
+float coords[N][NDIM] =
 	{      // Example coordinates for methanol
 {-0.748,  -0.015,   0.024},  // 6 atoms, use methanol.pdb for
 {	0.558,   0.420,  -0.278},  // visualization in VMD
@@ -92,26 +92,26 @@ int nstximd              = 0;
 int myimd_wait           = 1;
 int myimd_port           = -3000; // If the value is negative, we will print debug output!
 
-void myimd_init( ) 
+void myimd_init( )
 	{                                        // --- MDD Initialization function ---
 	static int fp_comm = -1;
-	if ( fp_comm == -1) 
+	if ( fp_comm == -1)
 		{
 		MYIMDlog = stderr;
-		//MYIMDdebug = IIMD_init(myimd_wait, myimd_port, MYIMDdebug, MYIMDlog, &nstximd, &MYIMDstop); 
+		//MYIMDdebug = IIMD_init(myimd_wait, myimd_port, MYIMDdebug, MYIMDlog, &nstximd, &MYIMDstop);
 		IIMD_treatevent();
 		fp_comm = 1;
 		}
 	}
 
-void myimd_send_traj(int* n, float* coords) 
+void myimd_send_traj(int* n, float* coords)
 	{          // --- Send our trajectory data via MDD ---
 	myimd_init();
 	IIMD_treatevent();
 	IIMD_send_coords(n, coords);
 	}
 
-void myimd_send_energies(int step_) 
+void myimd_send_energies(int step_)
 	{              // --- Send some energy information via MDD ---
 	energies.tstep  = step_;
 	energies.T = energies.Etot = energies.Epot = energies.Evdw = energies.Eelec = 0;
@@ -119,7 +119,7 @@ void myimd_send_energies(int step_)
 	IIMD_send_energies( &energies );
 	}
 
-void myimd_ext_forces( ) 
+void myimd_ext_forces( )
 	{   // --- Receive some information about user applied forces via MDD ---
 	int i, index;
 	imd_int32 n_atoms     = 0;
@@ -128,32 +128,32 @@ void myimd_ext_forces( )
 
 	myimd_init();
 	IIMD_treatevent();
-	IIMD_get_forces( &n_atoms, &atom_list, &force_list ); 
+	IIMD_get_forces( &n_atoms, &atom_list, &force_list );
 
-	if (n_atoms != 0) 
+	if (n_atoms != 0)
 		{ // print forces if received, so we see how to use log and debug
-		for (i=0; i <  n_atoms ; i++) 
+		for (i=0; i <  n_atoms ; i++)
 			{
 			index = atom_list[i];
-			if ( MYIMDdebug ) 
+			if ( MYIMDdebug )
 				{
-				fprintf(MYIMDlog, "F(%7d) %8.2e %8.2e %8.2e \n", 
+				fprintf(MYIMDlog, "F(%7d) %8.2e %8.2e %8.2e \n",
 				index, force_list[i*3], force_list[i*3+1], force_list[i*3+2]
 				);
-				} 
+				}
 			}
 		}
-	}	
+	}
 
-void my_calculation(float coords[][NDIM]) 
+void my_calculation(float coords[][NDIM])
 	{ // --- our "calculation" is just a shift in y direction ---
 	int i=0;
 	for (i=0; i< N; i++) coords[i][1] += 0.05;
-		#if defined(_WIN32) 
+		#if defined(_WIN32)
 			Sleep(1000);
 		#else
 			sleep(1);
-#endif	
+#endif
 	}
 
 int main()                                                      // -- THIS IS THE MAIN PROGRAM LOOP ---
@@ -161,7 +161,7 @@ int main()                                                      // -- THIS IS TH
 	int n=N;
 	int i=0;
 	for(i=0;;i++)
-		{		
+		{
 		my_calculation(coords);
 		myimd_send_traj(&n, *coords);    // send our coordinates
 		myimd_send_energies(i);          // send our energies
