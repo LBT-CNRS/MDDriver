@@ -71,14 +71,21 @@ Testing MDDriver
 
 You should see energy and coords exchanging by the server and the client.
 
-Interacting with GROMACS simulation in VMD using MDDriver
+Installing and using MDDriver for interactive simulation with VMD
 ================================================
 
-Lauching simulation:
----------------------------------------------------
+Nothing to do as MDDriver is compatible with IMD network protocol (Interactive Molecular Dynamic) use by VMD and NAMD
+
+Installing MDDriver to use it with UnityMol
+================================================
+
+
+
+Launching GROMACS simulation with MDDdriver features (VMD or UnityMol)
+================================================
 
 * Download VMD, http://www.ks.uiuc.edu/Research/vmd.
-* Go to the data directory and go to and example directory: 
+* Go to the data directory and go to and example directory:
 
         cd ${MDDRIVER_DATA_PATH}/02_peptide_200
 
@@ -93,8 +100,8 @@ Lauching simulation:
 
         mdrun -IMDfreq 1 -IMDwait 1 -IMDport 3000 -IMDmsg 1 -s model.tpr -x output/imd -deffnm output/imd
 
-Lauching VMD :
----------------------------------------------------
+Lauching VMD to interact with simulation
+================================================
 Lauching VMD.
 
 * Open the description of the molecular system in the pdb file model.pdb you have used for simulation :
@@ -111,6 +118,12 @@ Lauching VMD.
 Interact with the scene, using VMD tools:
 ---------------------------------------------------
 In a low VR Context (Mouse) go to Mouse>Force, choose a selection mode and pick in the rendering window. For a higher VR context (with haptic device), first lauch VRPN server managing your VR device, then define a .vmdsensor file to configure your device, and finally use the Graphics>Tools menu.
+
+Lauching Unity to interact with simulation
+================================================
+
+
+
 
 Copyright and License
 ================================================
