@@ -26,27 +26,27 @@
 * interactive simulations. This software is governed by the CeCILL-C license
 * under French law and abiding by the rules of distribution of free software.
 * You can use, modify and/or redistribute the software under the terms of the
-* CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL 
+* CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL
 * “http://www.cecill.info”.
-* 
-* As a counterpart to the access to the source code and rights to copy, 
-* modify and redistribute granted by the license, users are provided only 
-* with a limited warranty and the software’s author, the holder of the 
-* economic rights, and the successive licensors have only limited 
+*
+* As a counterpart to the access to the source code and rights to copy,
+* modify and redistribute granted by the license, users are provided only
+* with a limited warranty and the software’s author, the holder of the
+* economic rights, and the successive licensors have only limited
 * liability.
 *
-* In this respect, the user’s attention is drawn to the risks associated 
-* with loading, using, modifying and/or developing or reproducing the 
-* software by the user in light of its specific status of free software, 
-* that may mean that it is complicated to manipulate, and that also 
-* therefore means that it is reserved for developers and experienced 
-* professionals having in-depth computer knowledge. Users are therefore 
-* encouraged to load and test the software’s suitability as regards their 
-* requirements in conditions enabling the security of their systems and/or 
-* data to be ensured and, more generally, to use and operate it in the 
+* In this respect, the user’s attention is drawn to the risks associated
+* with loading, using, modifying and/or developing or reproducing the
+* software by the user in light of its specific status of free software,
+* that may mean that it is complicated to manipulate, and that also
+* therefore means that it is reserved for developers and experienced
+* professionals having in-depth computer knowledge. Users are therefore
+* encouraged to load and test the software’s suitability as regards their
+* requirements in conditions enabling the security of their systems and/or
+* data to be ensured and, more generally, to use and operate it in the
 * same conditions as regards security.
 *
-* The fact that you are presently reading this means that you have had 
+* The fact that you are presently reading this means that you have had
 * knowledge of the CeCILL-C license and that you accept its terms.
 *
 * $Id: servertest.c,v 1.2 2008-06-30 06:56:24 mdd Exp $
@@ -55,8 +55,8 @@
 * an example program
 *
 *
-* References : 
-* If you use this code, could you please cite one of these references : 	
+* References :
+* If you use this code, could you please cite one of these references :
 * O. Delalande, N. Ferey, G. Grasseau and M. Baaden : "Complex Molecular Assemblies at hand via Interactive Simulations", 2009, Journal of Computational Chemistry 2009.
 * N. Ferey, O. Delalande, G. Grasseau and M. Baaden : "A VR framework for interacting with molecular simulations", 2008, in proceedings of ACM symposium on Virtual reality software and technology (ACM - VRST'08).
 * N. Ferey, O. Delalande, G. Grasseau and M. Baaden : "From Interactive to Immersive Molecular Dynamics", in Proceedings of the international Workshop on Virtual Reality and Physical Simulation (Eurographics - VRIPHYS'08).
@@ -86,7 +86,7 @@
 #define CURRCALC 1
 
 // Example coordinates for deca-alanine, 104 atoms, use test.pdb for visualization in VMD
-float coords[N][NDIM] = 
+float coords[N][NDIM] =
 {
 	{ 0.675,  -1.852,   0.841},
 	{-0.060,  -1.319,   1.348},
@@ -196,9 +196,10 @@ float coords[N][NDIM] =
 
 
 // my_imd configuration
-static int   MYIMDdebug  = 2;
-static FILE *MYIMDlog;
+static int   MYIMDdebug  = 1;
+static FILE *MYIMDlog = NULL;
 static int   MYIMDstop   = 0;
+static int   MYIMDpause = 0;
 static int mode = 1; //server
 // Converting Calories x Angstrom-1
 // to Joules x nm-1
@@ -212,22 +213,24 @@ static IMDEnergies energies;
 
 int nstximd              = 0;
 int myimd_wait           = 1;
+int myimd_log           = -1;
 
 // If the value is negative, we will print debug output!
 int myimd_port           = 3000;
 
 
 // MDD Initialization function
-void myimd_init( ) 
+void myimd_init( )
 	{
-	static int fp_comm = -1;
 	// IMD initialisation
-	if ( fp_comm == -1) 
+	if (!IIMD_probeconnection())
 		{
-		MYIMDlog= IIMD_init( "",&mode, &myimd_wait, &myimd_port, &MYIMDdebug,0 );
-		IIMD_probeconnection();
-		IIMD_treatprotocol();
-		fp_comm = 1;
+		MYIMDlog= IIMD_init( "",&mode, &myimd_wait, &myimd_port, &myimd_log,0 );
+		#if defined(_WIN32)
+			Sleep(500);
+		#else
+			usleep(500000);
+		#endif
 		}
 	}
 
@@ -239,20 +242,13 @@ void myimd_init( )
 
 // Send our trajectory data via MDD; this should only be done on the master process
 // if we are in a parallel calculation module (MPI and such)
-void myimd_send_traj(int* n, float* coords) 
+void myimd_send_traj(int* n, float* coords)
 	{
-	myimd_init();
-	IIMD_probeconnection();
-	IIMD_treatprotocol();
-
-	if ( MYIMDdebug ) 
+	if ( MYIMDdebug )
 		{
-		fprintf(MYIMDlog, 
-		"MYMDD > \n");
-		fprintf(MYIMDlog, 
-		"MYMDD > Sending %d atom positions \n", *n);
-		fprintf(MYIMDlog, 
-		"MYMDD > \n");
+		fprintf(MYIMDlog, "MYMDD > \n");
+		fprintf(MYIMDlog, "MYMDD > Sending %d atom positions \n", *n);
+		fprintf(MYIMDlog, "MYMDD > \n");
 		}
 
 	// Let's send our coordinates to the visualization program
@@ -265,7 +261,7 @@ void myimd_send_traj(int* n, float* coords)
 
 // Send some energy information via MDD; this should only be done on the master process
 // if we are in a parallel calculation module (MPI and such)
-void myimd_send_energies(int step_) 
+void myimd_send_energies(int step_)
 	{
 	energies.tstep  = step_;
 	// normally we would retrieve the values below from some data structure in
@@ -281,7 +277,7 @@ void myimd_send_energies(int step_)
 	energies.Eimpr  =  33.0 + 10.0 * ( (double)rand() / (double)(RAND_MAX) ) * JouleToCalory;
 
 	// should we print the energies to the log file?
-	if ( MYIMDdebug ) 
+	if ( MYIMDdebug )
 		{
 
 		fprintf(MYIMDlog, "MYMDD > \n");
@@ -289,34 +285,34 @@ void myimd_send_energies(int step_)
 		fprintf(MYIMDlog, "MYMDD > ================================\n");
 		fprintf(MYIMDlog, "MYMDD >   \n");
 		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
-		fprintf(MYIMDlog, 
+		fprintf(MYIMDlog,
 		"MYMDD >   [Cal] for energies, [K] for the temperature \n" );
-		fprintf(MYIMDlog, 
+		fprintf(MYIMDlog,
 		"MYMDD >   [Bar] for pressure\n" );
-		fprintf(MYIMDlog, 
+		fprintf(MYIMDlog,
 		"MYMDD >   ------------------------------------------ \n");
 		fprintf(MYIMDlog, "MYMDD >  \n");
 		fprintf(MYIMDlog, "MYMDD >   VMD Energy List \n" );
 		fprintf(MYIMDlog, "MYMDD >   --------------------\n");
-		fprintf(MYIMDlog, "MYMDD >   Time step         [ ]   %12d\n", 
+		fprintf(MYIMDlog, "MYMDD >   Time step         [ ]   %12d\n",
 		energies.tstep);
-		fprintf(MYIMDlog, "MYMDD >   Temperature       [K]   %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Temperature       [K]   %12.5e\n",
 		energies.T);
-		fprintf(MYIMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n",
 		energies.Etot);
-		fprintf(MYIMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n",
 		energies.Ebond);
-		fprintf(MYIMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n",
 		energies.Eangle);
-		fprintf(MYIMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n",
 		energies.Epot);
-		fprintf(MYIMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n",
 		energies.Edihe);
-		fprintf(MYIMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n",
 		energies.Eimpr);
-		fprintf(MYIMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n",
 		energies.Evdw);
-		fprintf(MYIMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n", 
+		fprintf(MYIMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n",
 		energies.Eelec);
 		fprintf(MYIMDlog, "MYMDD > \n");
 		}
@@ -330,14 +326,14 @@ void myimd_send_energies(int step_)
 
 // Receive some information about user applied forces via MDD; this should only be done
 // on the master process if we are in a parallel calculation module (MPI and such)
-void myimd_ext_forces( ) 
+void myimd_ext_forces( )
 	{
-	int i;	
+	int i;
 	// Broadcast Number of forces, Atoms list and force list
 	imd_int32 n_atoms     = 0;
 	imd_int32 *atom_list  = 0;
 	float     *force_list = 0;
-	if ( MYIMDdebug ) 
+	if ( MYIMDdebug )
 		{
 		fprintf(MYIMDlog,"MYMDD > \n");
 		fprintf(MYIMDlog,"MYMDD >   Forces \n");
@@ -345,20 +341,16 @@ void myimd_ext_forces( )
 		fprintf(MYIMDlog,"MYMDD > \n");
 		}
 
-	myimd_init();
-	// Probe connexion
 
-	
+	IIMD_get_forces( &n_atoms, &atom_list, &force_list );
 
-	IIMD_get_forces( &n_atoms, &atom_list, &force_list ); 
-
-	if ( MYIMDdebug ) 
+	if ( MYIMDdebug )
 		{
-		fprintf(MYIMDlog,"MYMDD > \n");		
+		fprintf(MYIMDlog,"MYMDD > \n");
 		fprintf(MYIMDlog,
 		"MYMDD > Number of Ext. forces dF = %d\n", n_atoms);
 		fprintf(MYIMDlog,"MYMDD  > \n");
-		if( n_atoms != 0 ) 
+		if( n_atoms != 0 )
 			{
 			fprintf(MYIMDlog,"MYMDD >  Force list [J/nm]\n");
 			fprintf(MYIMDlog,
@@ -368,35 +360,34 @@ void myimd_ext_forces( )
 			}
 		}
 
-	if (n_atoms != 0) 
+	if (n_atoms != 0)
 		{
 		int index;
 
-		for (i=0; i <  n_atoms ; i++) 
+		for (i=0; i <  n_atoms ; i++)
 			{
 			index = atom_list[i];
-			if ( MYIMDdebug ) 
+			if ( MYIMDdebug )
 				{
-				fprintf(MYIMDlog,
-				"MYMDD > %4d %7d %8.2e %8.2e %8.2e %8.2e %8.2e %8.2e \n", 
-				1, index, 
-				//CaloryToJoule * 
+				fprintf(MYIMDlog,"MYMDD > %4d %7d %8.2e %8.2e %8.2e %8.2e %8.2e %8.2e \n",
+				1, index,
+				//CaloryToJoule *
 				force_list[i*3],
-				//CaloryToJoule * 
+				//CaloryToJoule *
 				force_list[i*3+1],
-				//CaloryToJoule * 
+				//CaloryToJoule *
 				force_list[i*3+2],0.0,0.0,0.0
 				);
-				} 
+				}
 			// Do whatever you want with the forces from force_list!
 			// for example update a per-atom force array..
 			// ..note that VMD sends forces in calories, so here we convert to
 			// Joule for example. Depends on your software.
 			}
-		if ( MYIMDdebug ) 
+		if ( MYIMDdebug )
 			{
 			fprintf(MYIMDlog,"MYMDD > \n");
-			} 
+			}
 		}
 	}
 
@@ -406,10 +397,10 @@ void myimd_ext_forces( )
 // -----------------------------------------------------------
 
 // HERE WE INITIALIZE OUR COORDINATES WITH THE REFERENCE DATA
-void init_coords(float coord_out[][NDIM]) 
+void init_coords(float coord_out[][NDIM])
 	{
 	int i=0;
-	for (i=0; i< N; i++) 
+	for (i=0; i< N; i++)
 		{
 		coord_out[i][0] = coords[i][0];
 		coord_out[i][1] = coords[i][1];
@@ -418,25 +409,25 @@ void init_coords(float coord_out[][NDIM])
 	}
 
 // HERE WE "CALCULATE"
-void my_calculation(float coord_out[][NDIM]) 
+void my_calculation(float coord_out[][NDIM])
 	{
 	float	tmp;
 	int i=0;
-	for (i=0; i< N; i++) 
+	for (i=0; i< N; i++)
 		{
 		// Just displace the molecule
-		if (CURRCALC == 0 ) 
+		if (CURRCALC == 0 )
 			{
 			coord_out[i][1] = coord_out[i][1] + 0.05;
 
 			// jitter atom coordinate until the connection is terminated //
-			} 
-		else if (CURRCALC == 1 ) 
+			}
+		else if (CURRCALC == 1 )
 			{
 			//  generate random coordinates for this test
 			tmp = 1.0 * ( (double)rand() / (double)(RAND_MAX) );
 			//	if ( MYIMDdebug )
-			//		fprintf(MYIMDlog, "MYMDD > %8.5f \n", tmp); 
+			//		fprintf(MYIMDlog, "MYMDD > %8.5f \n", tmp);
 			coord_out[i][0] = coords[i][0] + tmp ;  /* coordinate x */
 			coord_out[i][1] = coords[i][1] - tmp ;  /* coordinate y */
 			coord_out[i][2] = coords[i][2] + tmp;   /* coordinate z */
@@ -445,9 +436,9 @@ void my_calculation(float coord_out[][NDIM])
 
 	// Control the "speed" of the calculation
 	#if defined(_WIN32)
-		Sleep(1);	
+		Sleep(50);
 	#else
-		usleep(1000);
+		usleep(50000);
 	#endif
 	}
 
@@ -460,35 +451,63 @@ int main()
 	{
 	int       n=N;
 	float     tmpcoords[N][NDIM];
-	int i=0;	
+	int i=0;
 	// initialize the coordinate array
 	init_coords(tmpcoords);
 
+	myimd_init();
+
 	for(i=0; MYIMDstop == 0; i++)
-		{		
-		// Calculate and update our coordinates
-		my_calculation(tmpcoords);
+		{
+		IIMD_probeconnection();
+		IIMD_treatprotocol();
 
-		// DO THE "IMD"
-		myimd_send_traj(&n, *tmpcoords); // send our coordinates
-		myimd_send_energies(i);          // send our energies
-		myimd_ext_forces();              // receive VMD's forces	
-
-		// Treats extra events
-		switch( imd_event ) 
+		if(!MYIMDpause)
 			{
+			// Calculate and update our coordinates
+			my_calculation(tmpcoords);
+
+			// DO THE "IMD"
+			myimd_send_traj(&n, *tmpcoords); // send our coordinates
+			myimd_send_energies(i);          // send our energies
+			myimd_ext_forces();              // receive VMD's forces
+			}
+		// Treats extra events
+		switch( imd_event )
+			{
+			if(imd_event==IMD_PAUSE)
+			 		exit(0);
 			case IMD_KILL:
 			MYIMDstop = 1;
+			fprintf(MYIMDlog,"MYMDD > Kill received\n");
 			// Important : clear the event
 			imd_event = -1;
 			break;
 			case IMD_TRATE:
+			fprintf(MYIMDlog,"MYMDD > Trate received\n");
 			nstximd = imd_value;
 			// Important : clear the event
 			imd_event = -1;
 			break;
+			case IMD_PAUSE:
+					fprintf(MYIMDlog,"MYMDD > Pause received\n");
+					if(MYIMDpause==1)
+						{
+						MYIMDpause = 0;
+						}
+					else
+						{
+						MYIMDpause = 1;
+						}
+			imd_event = -1;
+
+			break;
 			}
-		//usleep(1000000);
+		#if defined(_WIN32)
+			Sleep(500);
+		#else
+			usleep(500000);
+		#endif
 		}
 
 	// now finish gracefully
