@@ -694,7 +694,7 @@ FILE *IIMD_init( const char  *hostname, 	imd_int32   *mode,	imd_int32   *IMDwait
 		{
 		if ( vmdsock_connect(sock, hostname, IMDport) < 0 )
 			{
-			fprintf(IMDlog, "MDDriver >      Unable to connecte to server %s:%d\n",hostname, IMDport);
+			fprintf(IMDlog, "MDDriver >      Unable to connect to server %s:%d\n",hostname, IMDport);
 			vmdsock_destroy(sock);
 			sock = 0;
 			}
@@ -928,21 +928,26 @@ void IIMD_send_forces(const int *N_p, const int* AtomIndex, const float *forces)
 	if (IMDmsg >= 1)
 		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
 
-	/*if (IMDmsg >= 2)
+	if (IMDmsg >= 2)
 		{
 		fprintf(IMDlog, "MDDriver >      \n");
 		fprintf(IMDlog, "MDDriver >      Sent forces \n");
 		fprintf(IMDlog, "MDDriver >      ------------------------------- \n");
 		fprintf(IMDlog, "MDDriver >      \n");
 		fprintf(IMDlog, "MDDriver >	 Number of sent forces S %d \n" , N);
-		unsigned f=0;
+		unsigned fx=0;
+		unsigned fy=1;
+		unsigned fz=2;
 		unsigned i;
 
 		for(i=0;i<N;i++)
 			{
-			fprintf( IMDlog, "MDDriver >      Atom force %d : %f %f %f\n",AtomIndex[i],forces[f++],forces[f++],forces[f++]);
+			fx=3*i;
+			fy=3*i+1;
+			fz=3*i+2;			 		
+			fprintf( IMDlog, "MDDriver >      Atom force %d : %f %f %f\n",AtomIndex[i],forces[fx],forces[fy],forces[fz]);
 			}
-		}*/
+		}
 	if (sock && vmdsock_selwrite(sock,0))
 		{
 		if ( IMDswap )

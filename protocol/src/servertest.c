@@ -475,8 +475,6 @@ int main()
 		// Treats extra events
 		switch( imd_event )
 			{
-			if(imd_event==IMD_PAUSE)
-			 		exit(0);
 			case IMD_KILL:
 			MYIMDstop = 1;
 			fprintf(MYIMDlog,"MYMDD > Kill received\n");

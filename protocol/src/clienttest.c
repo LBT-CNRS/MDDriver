@@ -88,6 +88,13 @@ const double NmToAngstrom     = 10.0;
 
 typedef float t_coord[3];
 
+FILE *IMDlog;
+char IMDhostname[] = "localhost";
+int IMDport   = 3000;
+int IMDmsg = 0;
+int IMDwait   = 0;                     // Connection configuration
+int IMDmode=0;// 0 : client , 1 : server
+
 // Return a non zero value if a keyboard event occurs
 #if !defined(_WIN32)
 int keyboard_event()
@@ -102,16 +109,27 @@ int keyboard_event()
 	return FD_ISSET( STDIN_FILENO, &fds);
 	}
 #endif
+
+void connection()
+	{
+	while (!IIMD_probeconnection())
+		{
+		IMDlog =  IIMD_init( IMDhostname, &IMDmode,&IMDwait, &IMDport, &IMDmsg , 0 );
+		IIMD_treatevent();
+		#if defined(_WIN32)
+			Sleep(500);
+		#else
+			usleep(500000);
+		#endif
+		}
+	}
+
 // -----------------------------------------------------------
 // BELOW COMES THE MAIN PROGRAM LOOP WITH CALLS TO MDDRIVER
 // -----------------------------------------------------------
 int main()
 	{
-	int wait   = 0;                     // Connection configuration
 	//  char hostname[] = "lin1.idris.fr";
-	char hostname[] = "localhost";
-	int port   = 3000;
-	int IMDmsg = 0;
 	int pause  = 0;
   int log = 1;
 
@@ -128,10 +146,9 @@ int main()
 
 	IMDEnergies *p_energies;            // Energies
 
-	FILE *MYIMDlog;
 	int j;
 	char key;
-	int mode=0;// 0 : client , 1 : server
+
 	atoms_list[0] = 20;
 	atoms_list[1] = 0;
 	atoms_list[2] = 8;
@@ -158,17 +175,7 @@ int main()
 	forces_list[4][1] = 6.0;
 	forces_list[4][2] = 1.0;
 
-	// Test the connection
-	while (!IIMD_probeconnection())
-		{
-		MYIMDlog =  IIMD_init( hostname, &mode,&wait, &port, &IMDmsg , 0 );
-		IIMD_treatevent();
-		#if defined(_WIN32)
-			Sleep(500);
-		#else
-			usleep(500000);
-		#endif
-		};
+	connection();
 
 	i = 0;
 	while ( cont )
@@ -181,19 +188,19 @@ int main()
 				{
         if (log)
   				{//coords = *p_coords;
-  				fprintf(MYIMDlog,"MYMDD > \n");
-  				fprintf(MYIMDlog, "MYMDD > Send %d atoms (Time step=%d)\n",N_atoms, i);
-  				fprintf(MYIMDlog, "MYMDD > ================================\n");
-  				fprintf(MYIMDlog,"MYMDD > \n");
-  				fprintf(MYIMDlog,"MYMDD >  Force list (10 first atoms and the last one)\n");
-  				fprintf(MYIMDlog,"MYMDD > AtomID      x        y        z      \n");
-  				fprintf(MYIMDlog,"MYMDD > -------------------------------------\n");
+  				fprintf(IMDlog,"MYMDD > \n");
+  				fprintf(IMDlog, "MYMDD > Send %d atoms (Time step=%d)\n",N_atoms, i);
+  				fprintf(IMDlog, "MYMDD > ================================\n");
+  				fprintf(IMDlog,"MYMDD > \n");
+  				fprintf(IMDlog,"MYMDD >  Force list (10 first atoms and the last one)\n");
+  				fprintf(IMDlog,"MYMDD > AtomID      x        y        z      \n");
+  				fprintf(IMDlog,"MYMDD > -------------------------------------\n");
   				for (j=0; j < 10; j++)
   					{
-  				    fprintf(MYIMDlog,"MYMDD > %7d %8.2e %8.2e %8.2e\n", j,coords [j][0], coords[j][1], coords[j][2] );
+  				    fprintf(IMDlog,"MYMDD > %7d %8.2e %8.2e %8.2e\n", j,coords [j][0], coords[j][1], coords[j][2] );
           	}
   				j = N_atoms - 1;
-          fprintf(MYIMDlog,"MYMDD > %7d %8.2e %8.2e %8.2e\n", j,coords[j][0], coords[j][1], coords [j][2] );
+          fprintf(IMDlog,"MYMDD > %7d %8.2e %8.2e %8.2e\n", j,coords[j][0], coords[j][1], coords [j][2] );
           }
         }
 
@@ -202,28 +209,28 @@ int main()
 				{
 				if (log)
               {
-              fprintf(MYIMDlog, "MYMDD > \n");
-              fprintf(MYIMDlog, "MYMDD > Send energies (Time step=%d)\n" , i);
-              fprintf(MYIMDlog, "MYMDD > ================================\n");
-              fprintf(MYIMDlog, "MYMDD >   \n");
-              fprintf(MYIMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
-              fprintf(MYIMDlog, "MYMDD >   [Cal] for energies, [K] for the temperature \n" );
-              fprintf(MYIMDlog, "MYMDD >   [Bar] for pressure\n" );
-              fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
-              fprintf(MYIMDlog, "MYMDD >  \n");
-              fprintf(MYIMDlog, "MYMDD >   VMD Energy List \n" );
-              fprintf(MYIMDlog, "MYMDD >   --------------------\n");
-              fprintf(MYIMDlog, "MYMDD >   Time step         [ ]   %12d\n",p_energies->tstep);
-              fprintf(MYIMDlog, "MYMDD >   Temperature       [K]   %12.5e\n", p_energies->T);
-              fprintf(MYIMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n", p_energies->Etot);
-              fprintf(MYIMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n",p_energies->Ebond);
-              fprintf(MYIMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n",p_energies->Eangle);
-              fprintf(MYIMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n", p_energies->Epot);
-              fprintf(MYIMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n", p_energies->Edihe);
-              fprintf(MYIMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n",p_energies->Eimpr);
-              fprintf(MYIMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n",p_energies->Evdw);
-              fprintf(MYIMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n",p_energies->Eelec);
-              fprintf(MYIMDlog, "MYMDD > \n");
+              fprintf(IMDlog, "MYMDD > \n");
+              fprintf(IMDlog, "MYMDD > Send energies (Time step=%d)\n" , i);
+              fprintf(IMDlog, "MYMDD > ================================\n");
+              fprintf(IMDlog, "MYMDD >   \n");
+              fprintf(IMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
+              fprintf(IMDlog, "MYMDD >   [Cal] for energies, [K] for the temperature \n" );
+              fprintf(IMDlog, "MYMDD >   [Bar] for pressure\n" );
+              fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
+              fprintf(IMDlog, "MYMDD >  \n");
+              fprintf(IMDlog, "MYMDD >   VMD Energy List \n" );
+              fprintf(IMDlog, "MYMDD >   --------------------\n");
+              fprintf(IMDlog, "MYMDD >   Time step         [ ]   %12d\n",p_energies->tstep);
+              fprintf(IMDlog, "MYMDD >   Temperature       [K]   %12.5e\n", p_energies->T);
+              fprintf(IMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n", p_energies->Etot);
+              fprintf(IMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n",p_energies->Ebond);
+              fprintf(IMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n",p_energies->Eangle);
+              fprintf(IMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n", p_energies->Epot);
+              fprintf(IMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n", p_energies->Edihe);
+              fprintf(IMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n",p_energies->Eimpr);
+              fprintf(IMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n",p_energies->Evdw);
+              fprintf(IMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n",p_energies->Eelec);
+              fprintf(IMDlog, "MYMDD > \n");
               }
 				}
 
@@ -241,36 +248,37 @@ int main()
 			switch( key )
 				{
 				case 'q':
-					fprintf(MYIMDlog, "MYMDD > Stop simulation\n");
+					fprintf(IMDlog, "MYMDD > Stop simulation\n");
 					IIMD_send_kill();
 					cont = 0;
 				break;
 				case 'f':
-					fprintf(MYIMDlog, "MYMDD > Increment coords frequency \n");
+					fprintf(IMDlog, "MYMDD > Increment coords frequency \n");
 					ffreq++;
 					IIMD_send_trate( &ffreq );
 				break;
 				case 'p':
 					if (!pause)
 						{
-						fprintf(MYIMDlog, "MYMDD > Starting pause \n");
+						fprintf(IMDlog, "MYMDD > Starting pause \n");
 						}
 					else
 						{
-						fprintf(MYIMDlog, "MYMDD > Ending pause \n");
+						fprintf(IMDlog, "MYMDD > Ending pause \n");
 						}
 					IIMD_send_pause();
 					pause = !(pause);
 				break;
 				case 'd':
-					fprintf(MYIMDlog, "MYMDD > Disconnect \n");
+					fprintf(IMDlog, "MYMDD > Disconnect \n");
 					IIMD_send_disconnect();
-					cont = 0;
+					IIMD_terminate();
+					pause = 1;
 				break;
 				case 'c':
-					fprintf(MYIMDlog, "MYMDD > Connecting \n");
-					MYIMDlog =  IIMD_init( hostname, &mode, &wait, &port, &IMDmsg , 0 );
-					cont = 1;
+					fprintf(IMDlog, "MYMDD > Connecting \n");
+					connection();
+					pause = 0;
 				break;
 				}
 			}
@@ -285,5 +293,5 @@ int main()
 
 		IIMD_terminate ();
 	// MB which value to return at the end?
-		return 0;
+		exit(0);
 	}
