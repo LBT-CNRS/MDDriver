@@ -273,12 +273,7 @@ int main()
 					fprintf(IMDlog, "MYMDD > Disconnect \n");
 					IIMD_send_disconnect();
 					IIMD_terminate();
-					pause = 1;
-				break;
-				case 'c':
-					fprintf(IMDlog, "MYMDD > Connecting \n");
-					connection();
-					pause = 0;
+					cont = 0;
 				break;
 				}
 			}
@@ -292,6 +287,5 @@ int main()
 		}
 
 		IIMD_terminate ();
-	// MB which value to return at the end?
 		exit(0);
 	}
