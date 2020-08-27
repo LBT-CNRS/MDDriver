@@ -55,6 +55,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	SET(CMAKE_C_FLAGS "-arch x86_64  -D__MACOSX__")
 	#SET(CMAKE_C_FLAGS "-arch i386 -arch ppc -arch x86_64 -mmacosx-version-min=10.6  -D__MACOSX__")
 	#SET(CMAKE_OSX_SYSROOT /Developer/SDKs/MacOSX10.6.sdk)
+  set(CMAKE_MACOSX_RPATH 1)
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
@@ -108,6 +110,11 @@ INSTALL(DIRECTORY adapters
     PATTERN .svn EXCLUDE)
 INSTALL(FILES INSTALL README.md LICENSE
     DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME})
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  INSTALL(FILES ${LIB_DIR}/libmddrivershared.dylib
+                    RENAME libmddrivershared.bundle DESTINATION ${LIB_DIR})
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
 MESSAGE(STATUS "Please source ${MODULE_DIR}/MDDriver-config.sh or ${MODULE_DIR}/MDDriver-config.sh including environment variables for MDDRiver after compiling and installing")

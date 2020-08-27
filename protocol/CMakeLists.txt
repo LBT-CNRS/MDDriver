@@ -60,8 +60,15 @@ TARGET_LINK_LIBRARIES(clienttest mddriver)
 
 INSTALL(TARGETS clienttest servertest protocoltest
     RUNTIME DESTINATION ${MODULE_DIR})
+
+INSTALL(TARGETS clienttest servertest protocoltest
+        RUNTIME DESTINATION ${MODULE_DIR})
+
 INSTALL(TARGETS mddriver
     ARCHIVE DESTINATION ${LIB_DIR})
+
+INSTALL(TARGETS mddrivershared
+        LIBRARY DESTINATION ${LIB_DIR})
 
 
 INSTALL(DIRECTORY doc
