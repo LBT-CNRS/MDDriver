@@ -40,41 +40,25 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL-C license and that you accept its terms.
 
-
-
-INCLUDE_DIRECTORIES(include )
-
+INCLUDE_DIRECTORIES(include)
 ADD_LIBRARY(mddriver src/imd.c  src/imd_interface.c  src/vmdsock.c)
 ADD_LIBRARY(mddrivershared SHARED src/imd.c  src/imd_interface.c  src/vmdsock.c)
-
 #MDDRIVER LIBRARY
-
 ADD_EXECUTABLE (protocoltest src/protocoltest.c)
 TARGET_LINK_LIBRARIES(protocoltest mddriver)
-
 ADD_EXECUTABLE (servertest src/servertest.c)
 TARGET_LINK_LIBRARIES(servertest mddriver)
-
 ADD_EXECUTABLE (clienttest src/clienttest.c)
 TARGET_LINK_LIBRARIES(clienttest mddriver)
+INSTALL(TARGETS clienttest servertest protocoltest RUNTIME DESTINATION ${MODULE_DIR})
 
-INSTALL(TARGETS clienttest servertest protocoltest
-    RUNTIME DESTINATION ${MODULE_DIR})
+INSTALL(TARGETS mddriver ARCHIVE DESTINATION ${LIB_DIR})
+INSTALL(TARGETS mddrivershared LIBRARY DESTINATION ${LIB_DIR})
 
-INSTALL(TARGETS clienttest servertest protocoltest
-        RUNTIME DESTINATION ${MODULE_DIR})
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  INSTALL(FILES ${LIB_DIR}/libmddrivershared.dylib RENAME libmddrivershared.bundle DESTINATION ${LIB_DIR})
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-INSTALL(TARGETS mddriver
-    ARCHIVE DESTINATION ${LIB_DIR})
-
-INSTALL(TARGETS mddrivershared
-        LIBRARY DESTINATION ${LIB_DIR})
-
-
-INSTALL(DIRECTORY doc
-    DESTINATION ${DOC_DIR}
-    PATTERN .svn EXCLUDE)
-INSTALL(FILES include/imd.h include/imd_interface.h include/vmdsock.h
-    DESTINATION ${INCLUDE_DIR})
-INSTALL(FILES Doxyfile
-    DESTINATION ${DOC_DIR})
+INSTALL(DIRECTORY doc DESTINATION ${DOC_DIR} PATTERN .svn EXCLUDE)
+INSTALL(FILES include/imd.h include/imd_interface.h include/vmdsock.h DESTINATION ${INCLUDE_DIR})
+INSTALL(FILES Doxyfile DESTINATION ${DOC_DIR})
