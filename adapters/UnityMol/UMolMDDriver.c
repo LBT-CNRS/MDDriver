@@ -20,7 +20,7 @@ extern "C"
 {
 #endif
 
-extern void MDDriver_init(const char *hostname, int port);
+extern int MDDriver_init(const char *hostname, int port);
 extern int MDDriver_start();
 extern int MDDriver_stop();
 extern bool MDDriver_isConnected();
@@ -52,7 +52,7 @@ int nb_forces = 0;
 float *forces_list;
 int *forces_atoms_list;
 
-void MDDriver_init(const char *hostname, int port) {
+int MDDriver_init(const char *hostname, int port) {
     int mode = 0;
     int wait = 0;
     int IMDmsg = 0;
@@ -64,7 +64,7 @@ void MDDriver_init(const char *hostname, int port) {
 
     while (!IIMD_probeconnection()) {
         IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , 0);
-
+        IIMD_treatevent();
 #if defined(_WIN32)
         Sleep(500);
 #else
@@ -74,7 +74,6 @@ void MDDriver_init(const char *hostname, int port) {
         if (t >= tries)
             break;
     }
-
 }
 
 int MDDriver_start()
@@ -112,8 +111,8 @@ int MDDriver_stop() {
 void MDDriver_disconnect() {
     if (IIMD_probeconnection()) {
         IIMD_send_disconnect();
+        IIMD_terminate();
     }
-    IIMD_terminate();
     N_atoms = 0;
 
     freeForces();
@@ -172,19 +171,8 @@ void MDDriver_getEnergies(IMDEnergies **energies) {
 
 void MDDriver_loop() {
     IIMD_treatprotocol();
+
     if (nb_forces != 0) {
         IIMD_send_forces( &nb_forces,  forces_atoms_list,  (const float *) forces_list );
-    }
-    else {
-        int *atomlist;
-        float *forceList;
-        int nf = 0;
-
-        IIMD_get_forces(&nf, &atomlist, &forceList);
-        fprintf(MYIMDlog, "Hahah ! %d", nf);
-        if (nf > 0) {
-            fprintf(MYIMDlog, "%d", atomlist[0]);
-        }
-
     }
 }
