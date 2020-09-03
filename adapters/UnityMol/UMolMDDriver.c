@@ -5,13 +5,17 @@
 #include "imd.h"
 #include "imd_interface.h"
 
-#include "MDDriver.h"
+//#include "MDDriver.h"
 
-#include <iostream>
+
+#include <stdbool.h>
+#include <string.h>
+//#include <iostream>
 #if defined(_WIN32)
 #include <Windows.h>
 #else
 #include <unistd.h>
+#include <stdlib.h>
 #endif
 
 
@@ -72,8 +76,11 @@ int MDDriver_init(const char *hostname, int port) {
 #endif
         t++;
         if (t >= tries)
-            break;
+            {
+            return 1;
+            }
     }
+    return 0;
 }
 
 int MDDriver_start()
