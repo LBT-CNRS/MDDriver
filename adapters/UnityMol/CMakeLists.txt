@@ -44,7 +44,7 @@
 
 PROJECT (MDDRIVER)
 INCLUDE_DIRECTORIES(../../protocol/include)
-ADD_LIBRARY(Unity_MDDriver SHARED UMolMDDriver.c)
+ADD_LIBRARY(Unity_MDDriver SHARED UMolMDDriver.cpp)
 TARGET_LINK_LIBRARIES(Unity_MDDriver mddriver)
 
 IF (UNITYMOL_PLUGIN)
