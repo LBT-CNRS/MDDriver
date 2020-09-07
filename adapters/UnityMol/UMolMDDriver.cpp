@@ -53,8 +53,8 @@ public:
     FILE *MYIMDlog;
 
     int nb_forces = 0;
-    float *forces_list;
-    int *forces_atoms_list;
+    float *forces_list = NULL;
+    int *forces_atoms_list = NULL;
 
     MDDriverAdapter();
 };
@@ -74,7 +74,6 @@ API int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int po
 API int MDDriver_start(MDDriverAdapter *mddinstance);
 API int MDDriver_stop(MDDriverAdapter *mddinstance);
 API bool MDDriver_isConnected(MDDriverAdapter *mddinstance);
-API int MDDriver_probeconnection(MDDriverAdapter *mddinstance);
 API int MDDriver_getNbParticles(MDDriverAdapter *mddinstance);
 API int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *verts, int nbParticles);
 API void MDDriver_pause(MDDriverAdapter *mddinstance);

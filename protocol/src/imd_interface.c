@@ -534,7 +534,7 @@ void IIMD_treatprotocol()
 	// ===========
 	else
 		{
-		if ( sock != 0 && vmdsock_selread(sock,0))
+		while ( sock != 0 && vmdsock_selread(sock,0))
 			{
 			type = imd_recv_header(sock, &vmd_length);
 			switch (type)
