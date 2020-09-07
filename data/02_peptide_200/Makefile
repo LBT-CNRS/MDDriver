@@ -1,18 +1,14 @@
-MPIRUN=mpirun
-MDDRIVER=mdrun_mpi
-GROMPP=grompp_mpi
-PDB2GMX=pdb2gmx_mpi
+MDRUN=gmx mdrun
+GROMPP=gmx grompp
+PDB2GMX=gmx pdb2gmx
 
 # MDDriver option 
-# -IMDfreq nb number of simulation iteration steps between sending
-# -IMDwait 0 or 1, if the simulation server has to wait for client connection before starting
-# -IMDport port port 
-# -IMDmsg loglevel 0 no log - 2 log ()  
+# -imdwait if you want to wait for interaction connection before starting simulation
+# -imdport port port 
+# -imdterm to allow interaction component to stop simulation
+# -imdpull to take into account forces coming from interaction component in simulation  
 
-MDDRIVERLOG=test.log
-
-IMDOPT=-IMDfreq 1 -IMDwait 1 -IMDport 3000 -IMDmsg 0 -IMDlog ${MDDRIVERLOG}
-
+IMDOPT=-imdwait -imdpull -imdterm -imdport 8888
 
 
 PDB=model.pdb
@@ -24,9 +20,7 @@ GRO=model.gro
 
 TPR=model.tpr
 
-OUTPUT=output
-
-NBPROCS=4
+OUTPUT=output/imd
  
 prep: 
 	${PDB2GMX} -f ${PDB} -o ${GRO} -p ${TOP}
@@ -38,10 +32,7 @@ $(TPR): prep $(TOP) $(GRO) $(MDP)
 
 
 run: $(TPR)
-	 $(MPIRUN) -np $(NBPROCS) $(MDDRIVER) -v $(IMDOPT) -np $(NPROCS) -s $(TPR) -x $(OUTPUT) -deffnm $(OUTPUT)
+	 $(MDRUN)  -v -s $(TPR) -x $(OUTPUT) -deffnm $(OUTPUT) $(IMDOPT) 
 
-
-run_no_mpi:	$(TPR)
-	$(MDDRIVER) -v $(IMDOPT) -s $(TPR) -x $(OUTPUT) -deffnm $(OUTPUT)
 clean:
-	rm -rf $(TPR) $(TOP) ${GRO} ${GRO} $(OUTPUT) ${MDDRIVERLOG} mdout.mdp \#*\# gmximd.* posre.itp
+	rm -rf $(TPR) $(TOP) ${GRO} $(OUTPUT) ${MDDRIVERLOG} mdout.mdp \#*\# gmximd.* posre.itp
