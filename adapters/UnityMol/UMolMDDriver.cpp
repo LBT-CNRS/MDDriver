@@ -50,6 +50,7 @@ class MDDriverAdapter {
 public:
     int N_atoms = 0;
     t_coord *coords;
+    bool stopRunning = false;
     FILE *MYIMDlog;
 
     int nb_forces = 0;
@@ -80,7 +81,7 @@ API void MDDriver_pause(MDDriverAdapter *mddinstance);
 API void MDDriver_play(MDDriverAdapter *mddinstance);
 API void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float *forceslist);
 API void MDDriver_resetForces(MDDriverAdapter *mddinstance);
-API void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies **energies);
+API void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies);
 API void MDDriver_loop(MDDriverAdapter *mddinstance);
 API void MDDriver_disconnect(MDDriverAdapter *mddinstance);
 
@@ -103,7 +104,7 @@ int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int port) 
     // int IMDmsg = 3;
     int IMDPort = port;
     mddinstance->N_atoms = 0;
-    int tries = 20;//20*500ms = 10 seconds
+    int tries = 5;//5*500ms = 2.5 seconds
     int t = 0;
 
     while (!IIMD_probeconnection()) {
@@ -148,6 +149,7 @@ int MDDriver_stop(MDDriverAdapter *mddinstance) {
     if (IIMD_probeconnection()) {
         IIMD_send_kill();
         IIMD_send_disconnect();
+        mddinstance->stopRunning = true;
     }
     IIMD_terminate ();
     mddinstance->N_atoms = 0;
@@ -158,6 +160,7 @@ int MDDriver_stop(MDDriverAdapter *mddinstance) {
 void MDDriver_disconnect(MDDriverAdapter *mddinstance) {
     if (IIMD_probeconnection()) {
         IIMD_send_disconnect();
+        mddinstance->stopRunning = true;
         IIMD_terminate();
     }
     mddinstance->N_atoms = 0;
@@ -210,13 +213,25 @@ void MDDriver_resetForces(MDDriverAdapter *mddinstance) {
     MDDriver_freeForces(mddinstance);
 }
 
-void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies **energies) {
+void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies) {
     IMDEnergies *curE;
     IIMD_get_energies( &curE);
-    *energies = curE;
+    
+    energies->tstep = curE->tstep;
+    energies->T = curE->T;
+    energies->Etot = curE->Etot;
+    energies->Epot = curE->Epot;
+    energies->Evdw = curE->Evdw;
+    energies->Eelec = curE->Eelec;
+    energies->Ebond = curE->Ebond;
+    energies->Eangle = curE->Eangle;
+    energies->Edihe = curE->Edihe;
+    energies->Eimpr = curE->Eimpr;
 }
 
 void MDDriver_loop(MDDriverAdapter *mddinstance) {
+    if (mddinstance->stopRunning)
+        return;
     IIMD_treatprotocol();
 
     if (mddinstance->nb_forces != 0) {
