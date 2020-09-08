@@ -50,7 +50,6 @@ class MDDriverAdapter {
 public:
     int N_atoms = 0;
     t_coord *coords;
-    bool stopRunning = false;
     FILE *MYIMDlog;
 
     int nb_forces = 0;
@@ -63,6 +62,7 @@ public:
 MDDriverAdapter::MDDriverAdapter() {
 }
 
+void MDDriver_freeForces(MDDriverAdapter *mddinstance);
 
 #ifdef __cplusplus
 extern "C"
@@ -80,7 +80,6 @@ API int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *verts, int nb
 API void MDDriver_pause(MDDriverAdapter *mddinstance);
 API void MDDriver_play(MDDriverAdapter *mddinstance);
 API void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float *forceslist);
-API void MDDriver_resetForces(MDDriverAdapter *mddinstance);
 API void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies);
 API void MDDriver_loop(MDDriverAdapter *mddinstance);
 API void MDDriver_disconnect(MDDriverAdapter *mddinstance);
@@ -94,13 +93,16 @@ MDDriverAdapter *createMDDriverInstance() {
 }
 
 void deleteMDDriverInstance(MDDriverAdapter *mddinstance) {
+    IIMD_terminate();
+    mddinstance->N_atoms = 0;
+    MDDriver_freeForces(mddinstance);
     delete mddinstance;
 }
 
 int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int port) {
     int mode = 0;
     int wait = 0;
-    int IMDmsg = 0;
+    int IMDmsg = 1;
     // int IMDmsg = 3;
     int IMDPort = port;
     mddinstance->N_atoms = 0;
@@ -108,7 +110,7 @@ int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int port) 
     int t = 0;
 
     while (!IIMD_probeconnection()) {
-        IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , 0);
+        IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , "MDDriverOutput.txt");
         IIMD_treatevent();
 #if defined(_WIN32)
         Sleep(500);
@@ -137,8 +139,8 @@ int MDDriver_start(MDDriverAdapter *mddinstance)
 
 void MDDriver_freeForces(MDDriverAdapter *mddinstance) {
     if (mddinstance->forces_list != NULL) {
-        free(mddinstance->forces_list);
-        free(mddinstance->forces_atoms_list);
+        delete mddinstance->forces_list; //free(mddinstance->forces_list);
+        delete mddinstance->forces_atoms_list; //free(mddinstance->forces_atoms_list);
         mddinstance->forces_list = NULL;
         mddinstance->forces_atoms_list = NULL;
     }
@@ -149,9 +151,8 @@ int MDDriver_stop(MDDriverAdapter *mddinstance) {
     if (IIMD_probeconnection()) {
         IIMD_send_kill();
         IIMD_send_disconnect();
-        mddinstance->stopRunning = true;
     }
-    IIMD_terminate ();
+    // IIMD_terminate ();
     mddinstance->N_atoms = 0;
     MDDriver_freeForces(mddinstance);
     return 1;
@@ -160,12 +161,7 @@ int MDDriver_stop(MDDriverAdapter *mddinstance) {
 void MDDriver_disconnect(MDDriverAdapter *mddinstance) {
     if (IIMD_probeconnection()) {
         IIMD_send_disconnect();
-        mddinstance->stopRunning = true;
-        IIMD_terminate();
     }
-    mddinstance->N_atoms = 0;
-
-    MDDriver_freeForces(mddinstance);
 }
 
 
@@ -188,7 +184,7 @@ void MDDriver_play(MDDriverAdapter *mddinstance) {
     IIMD_send_pause();
 }
 
-int MDDriver_getPositions(MDDriverAdapter *mddinstance, float * coordinates, int nbPos) {
+int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *coordinates, int nbPos) {
     IIMD_get_coords( &(mddinstance->N_atoms), (float **) & (mddinstance->coords) );
     memcpy(coordinates, mddinstance->coords, nbPos * sizeof(float) * 3);
     return nbPos;
@@ -200,8 +196,8 @@ void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomsli
             free(mddinstance->forces_list);
             free(mddinstance->forces_atoms_list);
         }
-        mddinstance->forces_list = (float *)malloc(sizeof(float) * 3 * nbforces);
-        mddinstance->forces_atoms_list = (int *)malloc(sizeof(int) * nbforces);
+        mddinstance->forces_list = new float[3 * nbforces];//(float *)malloc(sizeof(float) * 3 * nbforces);
+        mddinstance->forces_atoms_list = new int[nbforces];//(int *)malloc(sizeof(int) * nbforces);
     }
 //mettre les precedentes forces a 0 ?
     memcpy(mddinstance->forces_list, forceslist, nbforces * sizeof(float) * 3);
@@ -209,14 +205,11 @@ void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomsli
 
     mddinstance->nb_forces = nbforces;
 }
-void MDDriver_resetForces(MDDriverAdapter *mddinstance) {
-    MDDriver_freeForces(mddinstance);
-}
 
 void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies) {
     IMDEnergies *curE;
     IIMD_get_energies( &curE);
-    
+
     energies->tstep = curE->tstep;
     energies->T = curE->T;
     energies->Etot = curE->Etot;
@@ -230,8 +223,6 @@ void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies) {
 }
 
 void MDDriver_loop(MDDriverAdapter *mddinstance) {
-    if (mddinstance->stopRunning)
-        return;
     IIMD_treatprotocol();
 
     if (mddinstance->nb_forces != 0) {

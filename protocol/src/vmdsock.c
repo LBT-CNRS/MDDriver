@@ -47,6 +47,8 @@
 
 #include <errno.h>
 
+#include <stdio.h>
+
 #include "vmdsock.h"
 
 int vmdsock_init(void) 
@@ -97,19 +99,20 @@ int  vmdsock_connect(void *v, const char *host, int port)
 	{
 	vmdsocket *s = (vmdsocket *) v;
 	char address[1030];
-	static struct hostent *h=0;
+	struct hostent *h=0;
 
+	int hnull = (h == NULL ? 1:0);
 	if( h== NULL ) 
 		{
 		h=gethostbyname(host);
 		if (h == NULL) 
 			return -1;
-		sprintf(address, "%d.%d.%d.%d",
+		}
+	sprintf(address, "%d.%d.%d.%d",
 		(unsigned char) h->h_addr_list[0][0],
 		(unsigned char) h->h_addr_list[0][1],
 		(unsigned char) h->h_addr_list[0][2],
 		(unsigned char) h->h_addr_list[0][3]);
-		}
 	memset(&(s->addr), 0, sizeof(s->addr)); 
 	s->addr.sin_family = PF_INET;
 	s->addr.sin_addr.s_addr = inet_addr(address);
