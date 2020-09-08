@@ -14,9 +14,12 @@ The previous [sourceforge repository](https://sourceforge.net/projects/mddriver/
 ```
 git clone https://github.com/LBT-CNRS/MDDriver
 cd MDDriver/
-mkdir build && cd build
-cmake .. -D'CMAKE_BUILD_TYPE=RELEASE' -A x64 #Release build for 64 bits arch
-make
+# On Windows (Visual Studio 2019)
+#cmake -S . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE="Release" -A x64
+# On Mac/Linux
+cmake -S . -B build -DCMAKE_BUILD_TYPE="Release" -A x64
+
+cmake --build build --config Release
 ```
 
 ## License
