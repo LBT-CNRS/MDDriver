@@ -9,6 +9,16 @@ The previous [sourceforge repository](https://sourceforge.net/projects/mddriver/
 ![](https://a.fsdn.com/con/app/proj/mddriver/screenshots/page16-1000-full.jpg/245/183/1.5)
 ![](https://a.fsdn.com/con/app/proj/mddriver/screenshots/page16-1004-full.jpg/245/183/1.5)
 
+## Compilation
+
+```
+git clone https://github.com/LBT-CNRS/MDDriver
+cd MDDriver/
+mkdir build && cd build
+cmake .. -D'CMAKE_BUILD_TYPE=RELEASE' -A x64 #Release build for 64 bits arch
+make
+```
+
 ## License
 
 CeCILL-C license compatible with the LGPL.
