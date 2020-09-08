@@ -102,7 +102,7 @@ void deleteMDDriverInstance(MDDriverAdapter *mddinstance) {
 int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int port) {
     int mode = 0;
     int wait = 0;
-    int IMDmsg = 1;
+    int IMDmsg = 0;
     // int IMDmsg = 3;
     int IMDPort = port;
     mddinstance->N_atoms = 0;
@@ -110,7 +110,7 @@ int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int port) 
     int t = 0;
 
     while (!IIMD_probeconnection()) {
-        IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , "MDDriverOutput.txt");
+        IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , 0);
         IIMD_treatevent();
 #if defined(_WIN32)
         Sleep(500);
