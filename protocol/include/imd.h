@@ -84,7 +84,8 @@ typedef struct
 	} IMDEnergies;
 
 // Swap little <-> big endian
-extern void imd_swap4(char *data, int ndata);
+//extern void imd_swap4(char *data, int ndata);
+extern void imd_swap4(void *data, long ndata);
 
 /* Send control messages - these consist of a header with no subsequent data */
 extern int imd_disconnect(void *);   //!< leave sim running but close IMD
