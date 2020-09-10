@@ -1106,9 +1106,9 @@ int IIMD_get_energies( IMDEnergies **energ_ )
 
     if (IMDmsg >= 1)
         fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+    *energ_ = &vmd_energies;
     if ( vmd_new_energies )
     {
-        *energ_ = &vmd_energies;
         rc = 1 ;
 
         if (IMDmsg >= 2)
@@ -1132,7 +1132,6 @@ int IIMD_get_energies( IMDEnergies **energ_ )
             fprintf(IMDlog, "MDDriver >      \n");
         }
     }
-
 
     vmd_new_energies = 0;
     if (IMDmsg >= 1)
