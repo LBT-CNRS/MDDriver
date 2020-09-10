@@ -111,6 +111,9 @@ int MDDriver_init(MDDriverAdapter *mddinstance, const char *hostname, int port) 
 
     while (!IIMD_probeconnection()) {
         IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , 0);
+        // IIMD_init( hostname, &mode, &wait, &IMDPort, &IMDmsg , "MDDriverDebug.txt");
+        if (IIMD_probeconnection())
+            return 0;
         IIMD_treatevent();
 #if defined(_WIN32)
         Sleep(500);
@@ -191,7 +194,7 @@ int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *coordinates, int 
 }
 
 void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float * forceslist) {
-    if (mddinstance->nb_forces != nbforces) {
+    if (mddinstance->nb_forces != nbforces || mddinstance->forces_list == NULL) {
         if (mddinstance->forces_list != NULL) {
             free(mddinstance->forces_list);
             free(mddinstance->forces_atoms_list);
@@ -226,6 +229,6 @@ void MDDriver_loop(MDDriverAdapter *mddinstance) {
     IIMD_treatprotocol();
 
     if (mddinstance->nb_forces != 0) {
-        IIMD_send_forces( &(mddinstance->nb_forces),  mddinstance->forces_atoms_list,  (const float *) (mddinstance->forces_list) );
+        IIMD_send_forces( &(mddinstance->nb_forces), mddinstance->forces_atoms_list, mddinstance->forces_list);
     }
 }

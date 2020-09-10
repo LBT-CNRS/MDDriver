@@ -923,7 +923,7 @@ void IIMD_send_coords(const int *N_p, const float *coords)
         fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
 }
 
-void IIMD_send_forces(const int *N_p, const int* AtomIndex, const float *forces)
+void IIMD_send_forces(const int *N_p, int* AtomIndex, float *forces)
 {
     int N = *N_p;
 
@@ -950,15 +950,18 @@ void IIMD_send_forces(const int *N_p, const int* AtomIndex, const float *forces)
             fprintf( IMDlog, "MDDriver >      Atom force %d : %f %f %f\n", AtomIndex[i], forces[fx], forces[fy], forces[fz]);
         }
     }
-    if (sock && vmdsock_selwrite(sock, 0))
+    if (sock) //&& vmdsock_selwrite(sock, 0))//XM: not sure why there is this
     {
         if ( IMDswap )
         {
-            imd_swap4( (char *) AtomIndex, N);
-            imd_swap4( (char *)forces, 3 * N);
+            imd_swap4( AtomIndex, N);
+            imd_swap4( forces, 3 * N);
         }
-        imd_send_mdcomm( sock, N, AtomIndex, (float*) forces);
-    }
+        if(imd_send_mdcomm( sock, N, AtomIndex, forces) && IMDmsg >= 1){
+        	fprintf( IMDlog, "MDDriver > ---- Failed to send forces in %s\n", __FUNCTION__);
+        	IIMD_send_disconnect();
+        }
+	}
 
     if (IMDmsg >= 1)
         fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);

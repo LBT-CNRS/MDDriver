@@ -138,10 +138,10 @@ extern imd_int64 imd_value;
 		/**
 		Send forces apply on the atoms of the molecular system
 		@param n_atoms number of atoms on which a force is applying
-		@param AtomIndex atom id arrays on which a force is applying(the array have n_atoms integers)
+		@param AtomIndex atom id arrays on which a force is applying (the array have n_atoms integers)
 		@param forces x y z force components applying on each atom in the atom_list id array (this array must have n_atoms*3 floats)
 		*/
-		extern void  IIMD_send_forces       ( const int *N_p, const int* AtomIndex, const float *forces );
+		extern void  IIMD_send_forces       ( const int *N_p, int* AtomIndex, float *forces );
 
 		/**
 		Disconnect the MDDriver connection
