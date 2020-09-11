@@ -89,7 +89,7 @@
 float coords[N][NDIM] =
 {
 	{ 0.675,  -1.852,   0.841},
-	{-0.060,  -1.319,   1.348},
+	{ -0.060,  -1.319,   1.348},
 	{1.601,  -1.923,   1.308},
 	{0.767,  -1.116,  -0.506},
 	{0.758,  -0.050,  -0.331},
@@ -137,61 +137,61 @@ float coords[N][NDIM] =
 	{ -9.546,  -5.809,   0.192},
 	{ -9.457,  -7.317,   1.165},
 	{ -7.967,  -6.413,   0.866},
-	{-10.071,  -7.991,  -1.463},
-	{-11.097,  -7.467,  -1.130},
-	{-10.118,  -9.060,  -2.375},
+	{ -10.071,  -7.991,  -1.463},
+	{ -11.097,  -7.467,  -1.130},
+	{ -10.118,  -9.060,  -2.375},
 	{ -9.200,  -9.438,  -2.464},
-	{-11.309,  -9.766,  -2.682},
-	{-12.088,  -9.050,  -2.900},
-	{-11.096, -10.447,  -4.029},
-	{-10.689, -11.477,  -3.933},
-	{-12.020, -10.599,  -4.626},
-	{-10.532,  -9.820,  -4.752},
-	{-11.734, -10.620,  -1.476},
-	{-11.625, -11.841,  -1.447},
-	{-12.408, -10.053,  -0.445},
-	{-12.464,  -9.064,  -0.333},
-	{-12.813, -10.853,   0.708},
-	{-12.033, -11.549,   0.979},
-	{-13.094,  -9.797,   1.816},
-	{-13.830,  -8.998,   1.584},
-	{-13.523, -10.308,   2.705},
-	{-12.221,  -9.141,   2.016},
-	{-14.072, -11.640,   0.485},
-	{-15.103, -11.354,   1.127},
-	{-14.072, -12.637,  -0.437},
-	{-13.239, -12.903,  -0.915},
-	{-15.146, -13.518,  -0.873},
-	{-16.028, -12.901,  -0.953},
-	{-14.640, -14.114,  -2.143},
-	{-14.193, -13.248,  -2.675},
-	{-13.891, -14.902,  -1.914},
-	{-15.483, -14.546,  -2.723},
-	{-15.636, -14.522,   0.191},
-	{-15.524, -15.772,   0.088},
-	{-16.285, -14.019,   1.277},
-	{-16.412, -13.032,   1.338},
-	{-16.630, -14.758,   2.413},
-	{-15.931, -15.577,   2.492},
-	{-16.298, -14.037,   3.670},
-	{-16.760, -14.659,   4.466},
-	{-15.190, -14.029,   3.752},
-	{-16.567, -12.967,   3.798},
-	{-18.091, -15.164,   2.368},
-	{-18.913, -14.589,   1.724},
-	{-21.002, -16.274,   3.801},
-	{-21.221, -16.919,   4.815},
-	{-21.819, -15.255,   3.410},
-	{-22.632, -15.022,   3.945},
-	{-21.519, -14.695,   2.639},
-	{-18.426, -16.340,   2.929},
-	{-17.745, -16.940,   3.341},
-	{-19.913, -16.805,   2.813},
-	{-20.249, -16.535,   1.822},
-	{-19.961, -18.362,   2.757},
-	{-20.844, -18.848,   2.290},
-	{-19.088, -18.784,   2.215},
-	{-19.817, -18.835,   3.753}
+	{ -11.309,  -9.766,  -2.682},
+	{ -12.088,  -9.050,  -2.900},
+	{ -11.096, -10.447,  -4.029},
+	{ -10.689, -11.477,  -3.933},
+	{ -12.020, -10.599,  -4.626},
+	{ -10.532,  -9.820,  -4.752},
+	{ -11.734, -10.620,  -1.476},
+	{ -11.625, -11.841,  -1.447},
+	{ -12.408, -10.053,  -0.445},
+	{ -12.464,  -9.064,  -0.333},
+	{ -12.813, -10.853,   0.708},
+	{ -12.033, -11.549,   0.979},
+	{ -13.094,  -9.797,   1.816},
+	{ -13.830,  -8.998,   1.584},
+	{ -13.523, -10.308,   2.705},
+	{ -12.221,  -9.141,   2.016},
+	{ -14.072, -11.640,   0.485},
+	{ -15.103, -11.354,   1.127},
+	{ -14.072, -12.637,  -0.437},
+	{ -13.239, -12.903,  -0.915},
+	{ -15.146, -13.518,  -0.873},
+	{ -16.028, -12.901,  -0.953},
+	{ -14.640, -14.114,  -2.143},
+	{ -14.193, -13.248,  -2.675},
+	{ -13.891, -14.902,  -1.914},
+	{ -15.483, -14.546,  -2.723},
+	{ -15.636, -14.522,   0.191},
+	{ -15.524, -15.772,   0.088},
+	{ -16.285, -14.019,   1.277},
+	{ -16.412, -13.032,   1.338},
+	{ -16.630, -14.758,   2.413},
+	{ -15.931, -15.577,   2.492},
+	{ -16.298, -14.037,   3.670},
+	{ -16.760, -14.659,   4.466},
+	{ -15.190, -14.029,   3.752},
+	{ -16.567, -12.967,   3.798},
+	{ -18.091, -15.164,   2.368},
+	{ -18.913, -14.589,   1.724},
+	{ -21.002, -16.274,   3.801},
+	{ -21.221, -16.919,   4.815},
+	{ -21.819, -15.255,   3.410},
+	{ -22.632, -15.022,   3.945},
+	{ -21.519, -14.695,   2.639},
+	{ -18.426, -16.340,   2.929},
+	{ -17.745, -16.940,   3.341},
+	{ -19.913, -16.805,   2.813},
+	{ -20.249, -16.535,   1.822},
+	{ -19.961, -18.362,   2.757},
+	{ -20.844, -18.848,   2.290},
+	{ -19.088, -18.784,   2.215},
+	{ -19.817, -18.835,   3.753}
 };
 
 
@@ -204,7 +204,7 @@ static int mode = 1; //server
 // Converting Calories x Angstrom-1
 // to Joules x nm-1
 const double CaloryToJoule    = 4.184;
-const double CaloryAToJouleNM = 4.184*10.0;
+const double CaloryAToJouleNM = 4.184 * 10.0;
 const double JouleToCalory    = 1. / 4.184;
 const double NmToAngstrom     = 10.0;
 
@@ -221,18 +221,18 @@ int myimd_port           = 3000;
 
 // MDD Initialization function
 void myimd_init( )
-	{
+{
 	// IMD initialisation
 	if (!IIMD_probeconnection())
-		{
-		MYIMDlog= IIMD_init( "",&mode, &myimd_wait, &myimd_port, &myimd_log,0 );
-		#if defined(_WIN32)
-			Sleep(500);
-		#else
-			usleep(500000);
-		#endif
-		}
+	{
+		MYIMDlog = IIMD_init( "", &mode, &myimd_wait, &myimd_port, &myimd_log, 0 );
+#if defined(_WIN32)
+		Sleep(500);
+#else
+		usleep(500000);
+#endif
 	}
+}
 
 
 // -----------------------------------------------------------
@@ -243,26 +243,26 @@ void myimd_init( )
 // Send our trajectory data via MDD; this should only be done on the master process
 // if we are in a parallel calculation module (MPI and such)
 void myimd_send_traj(int* n, float* coords)
-	{
+{
 	if ( MYIMDdebug )
-		{
+	{
 		fprintf(MYIMDlog, "MYMDD > \n");
 		fprintf(MYIMDlog, "MYMDD > Sending %d atom positions \n", *n);
 		fprintf(MYIMDlog, "MYMDD > \n");
-		}
+	}
 
 	// Let's send our coordinates to the visualization program
 	IIMD_send_coords(n, coords);
 	// More complex routines like for gromacs/gmx_send_traj can do...
 	//..conversion from nm to Angstrom
 	//..other data structure transformations
-	}
+}
 
 
 // Send some energy information via MDD; this should only be done on the master process
 // if we are in a parallel calculation module (MPI and such)
 void myimd_send_energies(int step_)
-	{
+{
 	energies.tstep  = step_;
 	// normally we would retrieve the values below from some data structure in
 	// the program, here we just assign some random values
@@ -278,7 +278,7 @@ void myimd_send_energies(int step_)
 
 	// should we print the energies to the log file?
 	if ( MYIMDdebug )
-		{
+	{
 
 		fprintf(MYIMDlog, "MYMDD > \n");
 		fprintf(MYIMDlog, "MYMDD > Send energies (Time step=%d)\n", step_);
@@ -286,110 +286,110 @@ void myimd_send_energies(int step_)
 		fprintf(MYIMDlog, "MYMDD >   \n");
 		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
 		fprintf(MYIMDlog,
-		"MYMDD >   [Cal] for energies, [K] for the temperature \n" );
+		        "MYMDD >   [Cal] for energies, [K] for the temperature \n" );
 		fprintf(MYIMDlog,
-		"MYMDD >   [Bar] for pressure\n" );
+		        "MYMDD >   [Bar] for pressure\n" );
 		fprintf(MYIMDlog,
-		"MYMDD >   ------------------------------------------ \n");
+		        "MYMDD >   ------------------------------------------ \n");
 		fprintf(MYIMDlog, "MYMDD >  \n");
 		fprintf(MYIMDlog, "MYMDD >   VMD Energy List \n" );
 		fprintf(MYIMDlog, "MYMDD >   --------------------\n");
 		fprintf(MYIMDlog, "MYMDD >   Time step         [ ]   %12d\n",
-		energies.tstep);
+		        energies.tstep);
 		fprintf(MYIMDlog, "MYMDD >   Temperature       [K]   %12.5e\n",
-		energies.T);
+		        energies.T);
 		fprintf(MYIMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n",
-		energies.Etot);
+		        energies.Etot);
 		fprintf(MYIMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n",
-		energies.Ebond);
+		        energies.Ebond);
 		fprintf(MYIMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n",
-		energies.Eangle);
+		        energies.Eangle);
 		fprintf(MYIMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n",
-		energies.Epot);
+		        energies.Epot);
 		fprintf(MYIMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n",
-		energies.Edihe);
+		        energies.Edihe);
 		fprintf(MYIMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n",
-		energies.Eimpr);
+		        energies.Eimpr);
 		fprintf(MYIMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n",
-		energies.Evdw);
+		        energies.Evdw);
 		fprintf(MYIMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n",
-		energies.Eelec);
+		        energies.Eelec);
 		fprintf(MYIMDlog, "MYMDD > \n");
-		}
+	}
 
 	// SEND ENERGIES
 	IIMD_send_energies( &energies );
 	// More complex routines like for gromacs/MYIMD_send_energies can do...
 	// ..whatever you want, for example unit conversion
-	}
+}
 
 
 // Receive some information about user applied forces via MDD; this should only be done
 // on the master process if we are in a parallel calculation module (MPI and such)
 void myimd_ext_forces( )
-	{
+{
 	int i;
 	// Broadcast Number of forces, Atoms list and force list
 	imd_int32 n_atoms     = 0;
 	imd_int32 *atom_list  = 0;
 	float     *force_list = 0;
 	if ( MYIMDdebug )
-		{
-		fprintf(MYIMDlog,"MYMDD > \n");
-		fprintf(MYIMDlog,"MYMDD >   Forces \n");
-		fprintf(MYIMDlog,"MYMDD > ==========\n");
-		fprintf(MYIMDlog,"MYMDD > \n");
-		}
+	{
+		fprintf(MYIMDlog, "MYMDD > \n");
+		fprintf(MYIMDlog, "MYMDD >   Forces \n");
+		fprintf(MYIMDlog, "MYMDD > ==========\n");
+		fprintf(MYIMDlog, "MYMDD > \n");
+	}
 
 
 	IIMD_get_forces( &n_atoms, &atom_list, &force_list );
 
 	if ( MYIMDdebug )
-		{
-		fprintf(MYIMDlog,"MYMDD > \n");
+	{
+		fprintf(MYIMDlog, "MYMDD > \n");
 		fprintf(MYIMDlog,
-		"MYMDD > Number of Ext. forces dF = %d\n", n_atoms);
-		fprintf(MYIMDlog,"MYMDD  > \n");
-		if( n_atoms != 0 )
-			{
-			fprintf(MYIMDlog,"MYMDD >  Force list [J/nm]\n");
+		        "MYMDD > Number of Ext. forces dF = %d\n", n_atoms);
+		fprintf(MYIMDlog, "MYMDD  > \n");
+		if ( n_atoms != 0 )
+		{
+			fprintf(MYIMDlog, "MYMDD >  Force list [J/nm]\n");
 			fprintf(MYIMDlog,
-			"MYMDD > Proc  AtomID     Fx       Fy       Fz      dFx      dFy      dFz    \n");
+			        "MYMDD > Proc  AtomID     Fx       Fy       Fz      dFx      dFy      dFz    \n");
 			fprintf(MYIMDlog,
-			"MYMDD > -------------------------------------------------------------------------\n");
-			}
+			        "MYMDD > -------------------------------------------------------------------------\n");
 		}
+	}
 
 	if (n_atoms != 0)
-		{
+	{
 		int index;
 
-		for (i=0; i <  n_atoms ; i++)
-			{
+		for (i = 0; i <  n_atoms ; i++)
+		{
 			index = atom_list[i];
 			if ( MYIMDdebug )
-				{
-				fprintf(MYIMDlog,"MYMDD > %4d %7d %8.2e %8.2e %8.2e %8.2e %8.2e %8.2e \n",
-				1, index,
-				//CaloryToJoule *
-				force_list[i*3],
-				//CaloryToJoule *
-				force_list[i*3+1],
-				//CaloryToJoule *
-				force_list[i*3+2],0.0,0.0,0.0
-				);
-				}
+			{
+				fprintf(MYIMDlog, "MYMDD > %4d %7d %8.2e %8.2e %8.2e %8.2e %8.2e %8.2e \n",
+				        1, index,
+				        //CaloryToJoule *
+				        force_list[i * 3],
+				        //CaloryToJoule *
+				        force_list[i * 3 + 1],
+				        //CaloryToJoule *
+				        force_list[i * 3 + 2], 0.0, 0.0, 0.0
+				       );
+			}
 			// Do whatever you want with the forces from force_list!
 			// for example update a per-atom force array..
 			// ..note that VMD sends forces in calories, so here we convert to
 			// Joule for example. Depends on your software.
-			}
+		}
 		if ( MYIMDdebug )
-			{
-			fprintf(MYIMDlog,"MYMDD > \n");
-			}
+		{
+			fprintf(MYIMDlog, "MYMDD > \n");
 		}
 	}
+}
 
 
 // -----------------------------------------------------------
@@ -398,32 +398,32 @@ void myimd_ext_forces( )
 
 // HERE WE INITIALIZE OUR COORDINATES WITH THE REFERENCE DATA
 void init_coords(float coord_out[][NDIM])
+{
+	int i = 0;
+	for (i = 0; i < N; i++)
 	{
-	int i=0;
-	for (i=0; i< N; i++)
-		{
 		coord_out[i][0] = coords[i][0];
 		coord_out[i][1] = coords[i][1];
 		coord_out[i][2] = coords[i][2];
-		}
 	}
+}
 
 // HERE WE "CALCULATE"
 void my_calculation(float coord_out[][NDIM])
-	{
+{
 	float	tmp;
-	int i=0;
-	for (i=0; i< N; i++)
-		{
+	int i = 0;
+	for (i = 0; i < N; i++)
+	{
 		// Just displace the molecule
 		if (CURRCALC == 0 )
-			{
+		{
 			coord_out[i][1] = coord_out[i][1] + 0.05;
 
 			// jitter atom coordinate until the connection is terminated //
-			}
+		}
 		else if (CURRCALC == 1 )
-			{
+		{
 			//  generate random coordinates for this test
 			tmp = 1.0 * ( (double)rand() / (double)(RAND_MAX) );
 			//	if ( MYIMDdebug )
@@ -431,16 +431,16 @@ void my_calculation(float coord_out[][NDIM])
 			coord_out[i][0] = coords[i][0] + tmp ;  /* coordinate x */
 			coord_out[i][1] = coords[i][1] - tmp ;  /* coordinate y */
 			coord_out[i][2] = coords[i][2] + tmp;   /* coordinate z */
-			}
 		}
+	}
 
 	// Control the "speed" of the calculation
-	#if defined(_WIN32)
-		Sleep(50);
-	#else
-		usleep(50000);
-	#endif
-	}
+#if defined(_WIN32)
+	Sleep(50);
+#else
+	usleep(50000);
+#endif
+}
 
 
 // -----------------------------------------------------------
@@ -448,22 +448,22 @@ void my_calculation(float coord_out[][NDIM])
 // -----------------------------------------------------------
 
 int main()
-	{
-	int       n=N;
+{
+	int       n = N;
 	float     tmpcoords[N][NDIM];
-	int i=0;
+	int i = 0;
 	// initialize the coordinate array
 	init_coords(tmpcoords);
 
 	myimd_init();
 
-	for(i=0; MYIMDstop == 0; i++)
-		{
+	for (i = 0; MYIMDstop == 0; i++)
+	{
 		IIMD_probeconnection();
 		IIMD_treatprotocol();
 
-		if(!MYIMDpause)
-			{
+		if (!MYIMDpause)
+		{
 			// Calculate and update our coordinates
 			my_calculation(tmpcoords);
 
@@ -471,47 +471,47 @@ int main()
 			myimd_send_traj(&n, *tmpcoords); // send our coordinates
 			myimd_send_energies(i);          // send our energies
 			myimd_ext_forces();              // receive VMD's forces
-			}
+		}
 		// Treats extra events
-		switch( imd_event )
-			{
-			case IMD_KILL:
+		switch ( imd_event )
+		{
+		case IMD_KILL:
 			MYIMDstop = 1;
-			fprintf(MYIMDlog,"MYMDD > Kill received\n");
+			fprintf(MYIMDlog, "MYMDD > Kill received\n");
 			// Important : clear the event
 			imd_event = -1;
 			break;
-			case IMD_TRATE:
-			fprintf(MYIMDlog,"MYMDD > Trate received\n");
+		case IMD_TRATE:
+			fprintf(MYIMDlog, "MYMDD > Trate received\n");
 			nstximd = imd_value;
 			// Important : clear the event
 			imd_event = -1;
 			break;
-			case IMD_PAUSE:
-					fprintf(MYIMDlog,"MYMDD > Pause received\n");
-					if(MYIMDpause==1)
-						{
-						MYIMDpause = 0;
-						}
-					else
-						{
-						MYIMDpause = 1;
-						}
+		case IMD_PAUSE:
+			fprintf(MYIMDlog, "MYMDD > Pause received\n");
+			if (MYIMDpause == 1)
+			{
+				MYIMDpause = 0;
+			}
+			else
+			{
+				MYIMDpause = 1;
+			}
 			imd_event = -1;
 
 			break;
-			}
-		#if defined(_WIN32)
-			Sleep(500);
-		#else
-			usleep(500000);
-		#endif
 		}
+#if defined(_WIN32)
+		Sleep(500);
+#else
+		usleep(500000);
+#endif
+	}
 
 	// now finish gracefully
-	fprintf(MYIMDlog,"MYMDD > \n");
-	fprintf(MYIMDlog,"MYMDD > stop simulation\n");
+	fprintf(MYIMDlog, "MYMDD > \n");
+	fprintf(MYIMDlog, "MYMDD > stop simulation\n");
 	IIMD_terminate();
 
 	return 0;
-	}
+}

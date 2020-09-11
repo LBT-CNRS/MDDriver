@@ -1108,9 +1108,12 @@ int IIMD_get_energies( IMDEnergies **energ_ )
 
 	if (IMDmsg >= 1)
 		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+	//Update the energ pointer even if no new energies
+	*energ_ = &vmd_energies;
+
 	if ( vmd_new_energies )
 	{
-		*energ_ = &vmd_energies;
 		rc = 1 ;
 
 		if (IMDmsg >= 2)
