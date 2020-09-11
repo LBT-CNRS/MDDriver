@@ -74,14 +74,14 @@
 #define NDIM 3
 
 float coords[N][NDIM] =
-	{      // Example coordinates for methanol
-{-0.748,  -0.015,   0.024},  // 6 atoms, use methanol.pdb for
-{	0.558,   0.420,  -0.278},  // visualization in VMD
-{	-1.293,  -0.202,  -0.901},
-{	-1.263,   0.754,   0.600},
-{	-0.699,  -0.934,   0.609},
-{	0.716,   1.404,   0.137}
-	};
+{	// Example coordinates for methanol
+	{ -0.748,  -0.015,   0.024}, // 6 atoms, use methanol.pdb for
+	{	0.558,   0.420,  -0.278},  // visualization in VMD
+	{	-1.293,  -0.202,  -0.901},
+	{	-1.263,   0.754,   0.600},
+	{	-0.699,  -0.934,   0.609},
+	{	0.716,   1.404,   0.137}
+};
 
 // my_imd configuration
 static int   MYIMDdebug  = 0;
@@ -93,34 +93,34 @@ int myimd_wait           = 1;
 int myimd_port           = -3000; // If the value is negative, we will print debug output!
 
 void myimd_init( )
-	{                                        // --- MDD Initialization function ---
+{	// --- MDD Initialization function ---
 	static int fp_comm = -1;
 	if ( fp_comm == -1)
-		{
+	{
 		MYIMDlog = stderr;
 		//MYIMDdebug = IIMD_init(myimd_wait, myimd_port, MYIMDdebug, MYIMDlog, &nstximd, &MYIMDstop);
 		IIMD_treatevent();
 		fp_comm = 1;
-		}
 	}
+}
 
 void myimd_send_traj(int* n, float* coords)
-	{          // --- Send our trajectory data via MDD ---
+{	// --- Send our trajectory data via MDD ---
 	myimd_init();
 	IIMD_treatevent();
 	IIMD_send_coords(n, coords);
-	}
+}
 
 void myimd_send_energies(int step_)
-	{              // --- Send some energy information via MDD ---
+{	// --- Send some energy information via MDD ---
 	energies.tstep  = step_;
 	energies.T = energies.Etot = energies.Epot = energies.Evdw = energies.Eelec = 0;
 	energies.Ebond = energies.Eangle = energies.Edihe = energies.Eimpr  = 0;
 	IIMD_send_energies( &energies );
-	}
+}
 
 void myimd_ext_forces( )
-	{   // --- Receive some information about user applied forces via MDD ---
+{	// --- Receive some information about user applied forces via MDD ---
 	int i, index;
 	imd_int32 n_atoms     = 0;
 	imd_int32 *atom_list  = 0;
@@ -131,43 +131,43 @@ void myimd_ext_forces( )
 	IIMD_get_forces( &n_atoms, &atom_list, &force_list );
 
 	if (n_atoms != 0)
-		{ // print forces if received, so we see how to use log and debug
-		for (i=0; i <  n_atoms ; i++)
-			{
+	{	// print forces if received, so we see how to use log and debug
+		for (i = 0; i <  n_atoms ; i++)
+		{
 			index = atom_list[i];
 			if ( MYIMDdebug )
-				{
+			{
 				fprintf(MYIMDlog, "F(%7d) %8.2e %8.2e %8.2e \n",
-				index, force_list[i*3], force_list[i*3+1], force_list[i*3+2]
-				);
-				}
+				        index, force_list[i * 3], force_list[i * 3 + 1], force_list[i * 3 + 2]
+				       );
 			}
 		}
 	}
+}
 
 void my_calculation(float coords[][NDIM])
-	{ // --- our "calculation" is just a shift in y direction ---
-	int i=0;
-	for (i=0; i< N; i++) coords[i][1] += 0.05;
-		#if defined(_WIN32)
-			Sleep(1000);
-		#else
-			sleep(1);
+{	// --- our "calculation" is just a shift in y direction ---
+	int i = 0;
+	for (i = 0; i < N; i++) coords[i][1] += 0.05;
+#if defined(_WIN32)
+	Sleep(1000);
+#else
+	sleep(1);
 #endif
-	}
+}
 
 int main()                                                      // -- THIS IS THE MAIN PROGRAM LOOP ---
+{
+	int n = N;
+	int i = 0;
+	for (i = 0;; i++)
 	{
-	int n=N;
-	int i=0;
-	for(i=0;;i++)
-		{
 		my_calculation(coords);
 		myimd_send_traj(&n, *coords);    // send our coordinates
 		myimd_send_energies(i);          // send our energies
 		myimd_ext_forces();              // receive VMD's forces
 		// implement condition to exit this loop end finish execution
-		}
+	}
 	IIMD_terminate();
 	return 0;
-	}
+}

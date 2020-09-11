@@ -66,10 +66,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #if defined(_WIN32)
-	#include <windows.h>
+#include <windows.h>
 #else
-	#include <unistd.h>
-	#include <sys/time.h>
+#include <unistd.h>
+#include <sys/time.h>
 #endif
 
 #include "imd_interface.h"
@@ -82,7 +82,7 @@
 // Converting Calories x Angstrom-1
 // to Joules x nm-1
 const double CaloryToJoule    = 4.184;
-const double CaloryAToJouleNM = 4.184*10.0;
+const double CaloryAToJouleNM = 4.184 * 10.0;
 const double JouleToCalory    = 1. / 4.184;
 const double NmToAngstrom     = 10.0;
 
@@ -93,199 +93,199 @@ char IMDhostname[] = "localhost";
 int IMDport   = 3000;
 int IMDmsg = 0;
 int IMDwait   = 0;                     // Connection configuration
-int IMDmode=0;// 0 : client , 1 : server
+int IMDmode = 0; // 0 : client , 1 : server
 
 // Return a non zero value if a keyboard event occurs
 #if !defined(_WIN32)
 int keyboard_event()
-	{
-	struct timeval tv;
-	fd_set fds;
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
-	FD_ZERO(&fds);
-	FD_SET(STDIN_FILENO, &fds);
-	select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
-	return FD_ISSET( STDIN_FILENO, &fds);
-	}
+{
+    struct timeval tv;
+    fd_set fds;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds);
+    select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+    return FD_ISSET( STDIN_FILENO, &fds);
+}
 #endif
 
 void connection()
-	{
-	while (!IIMD_probeconnection())
-		{
-		IMDlog =  IIMD_init( IMDhostname, &IMDmode,&IMDwait, &IMDport, &IMDmsg , 0 );
-		IIMD_treatevent();
-		#if defined(_WIN32)
-			Sleep(500);
-		#else
-			usleep(500000);
-		#endif
-		}
-	}
+{
+    while (!IIMD_probeconnection())
+    {
+        IMDlog =  IIMD_init( IMDhostname, &IMDmode, &IMDwait, &IMDport, &IMDmsg , 0 );
+        IIMD_treatevent();
+#if defined(_WIN32)
+        Sleep(500);
+#else
+        usleep(500000);
+#endif
+    }
+}
 
 // -----------------------------------------------------------
 // BELOW COMES THE MAIN PROGRAM LOOP WITH CALLS TO MDDRIVER
 // -----------------------------------------------------------
 int main()
-	{
-	//  char hostname[] = "lin1.idris.fr";
-	int pause  = 0;
-  int log = 1;
+{
+    //  char hostname[] = "lin1.idris.fr";
+    int pause  = 0;
+    int log = 1;
 
-	int N_atoms;                        // Atom positions
-	t_coord *coords;
+    int N_atoms;                        // Atom positions
+    t_coord *coords;
 
-	int N_forces=N_FORCE;
-	int   atoms_list[N_FORCE];//Force
-	float forces_list[N_FORCE][3];
+    int N_forces = N_FORCE;
+    int   atoms_list[N_FORCE];//Force
+    float forces_list[N_FORCE][3];
 
-	int cont   = 1;                     // Main loop control
-	int ffreq  = 10;
-	int i;
+    int cont   = 1;                     // Main loop control
+    int ffreq  = 10;
+    int i;
 
-	IMDEnergies *p_energies;            // Energies
+    IMDEnergies *p_energies;            // Energies
 
-	int j;
-	char key;
+    int j;
+    char key;
 
-	atoms_list[0] = 20;
-	atoms_list[1] = 0;
-	atoms_list[2] = 8;
-	atoms_list[3] = 4;
-	atoms_list[4] = 2;
+    atoms_list[0] = 20;
+    atoms_list[1] = 0;
+    atoms_list[2] = 8;
+    atoms_list[3] = 4;
+    atoms_list[4] = 2;
 
-	forces_list[0][0] = 10.0;
-	forces_list[0][1] = -1.0;
-	forces_list[0][2] = 1.0;
+    forces_list[0][0] = 10.0;
+    forces_list[0][1] = -1.0;
+    forces_list[0][2] = 1.0;
 
-	forces_list[1][0] = 2.0;
-	forces_list[1][1] = -1.0;
-	forces_list[1][2] = 1.0;
+    forces_list[1][0] = 2.0;
+    forces_list[1][1] = -1.0;
+    forces_list[1][2] = 1.0;
 
-	forces_list[2][0] = 4.0;
-	forces_list[2][1] = -1.0;
-	forces_list[2][2] = 1.0;
+    forces_list[2][0] = 4.0;
+    forces_list[2][1] = -1.0;
+    forces_list[2][2] = 1.0;
 
-	forces_list[3][0] = 8.0;
-	forces_list[3][1] = -1.0;
-	forces_list[3][2] = 1.0;
+    forces_list[3][0] = 8.0;
+    forces_list[3][1] = -1.0;
+    forces_list[3][2] = 1.0;
 
-	forces_list[4][0] = 10.0;
-	forces_list[4][1] = 6.0;
-	forces_list[4][2] = 1.0;
+    forces_list[4][0] = 10.0;
+    forces_list[4][1] = 6.0;
+    forces_list[4][2] = 1.0;
 
-	connection();
+    connection();
 
-	i = 0;
-	while ( cont )
-		{
-		IIMD_treatprotocol();
-		if( !pause )
-			{
-			// New atom positions
-			if ( IIMD_get_coords( &N_atoms, (float **) &coords ) )
-				{
-        if (log)
-  				{//coords = *p_coords;
-  				fprintf(IMDlog,"MYMDD > \n");
-  				fprintf(IMDlog, "MYMDD > Send %d atoms (Time step=%d)\n",N_atoms, i);
-  				fprintf(IMDlog, "MYMDD > ================================\n");
-  				fprintf(IMDlog,"MYMDD > \n");
-  				fprintf(IMDlog,"MYMDD >  Force list (10 first atoms and the last one)\n");
-  				fprintf(IMDlog,"MYMDD > AtomID      x        y        z      \n");
-  				fprintf(IMDlog,"MYMDD > -------------------------------------\n");
-  				for (j=0; j < 10; j++)
-  					{
-  				    fprintf(IMDlog,"MYMDD > %7d %8.2e %8.2e %8.2e\n", j,coords [j][0], coords[j][1], coords[j][2] );
-          	}
-  				j = N_atoms - 1;
-          fprintf(IMDlog,"MYMDD > %7d %8.2e %8.2e %8.2e\n", j,coords[j][0], coords[j][1], coords [j][2] );
-          }
+    i = 0;
+    while ( cont )
+    {
+        IIMD_treatprotocol();
+        if ( !pause )
+        {
+            // New atom positions
+            if ( IIMD_get_coords( &N_atoms, (float **) &coords ) )
+            {
+                if (log)
+                {   //coords = *p_coords;
+                    fprintf(IMDlog, "MYMDD > \n");
+                    fprintf(IMDlog, "MYMDD > Send %d atoms (Time step=%d)\n", N_atoms, i);
+                    fprintf(IMDlog, "MYMDD > ================================\n");
+                    fprintf(IMDlog, "MYMDD > \n");
+                    fprintf(IMDlog, "MYMDD >  Force list (10 first atoms and the last one)\n");
+                    fprintf(IMDlog, "MYMDD > AtomID      x        y        z      \n");
+                    fprintf(IMDlog, "MYMDD > -------------------------------------\n");
+                    for (j = 0; j < 10; j++)
+                    {
+                        fprintf(IMDlog, "MYMDD > %7d %8.2e %8.2e %8.2e\n", j, coords [j][0], coords[j][1], coords[j][2] );
+                    }
+                    j = N_atoms - 1;
+                    fprintf(IMDlog, "MYMDD > %7d %8.2e %8.2e %8.2e\n", j, coords[j][0], coords[j][1], coords [j][2] );
+                }
+            }
+
+            // New energies
+            if ( IIMD_get_energies( &p_energies ) )
+            {
+                if (log)
+                {
+                    fprintf(IMDlog, "MYMDD > \n");
+                    fprintf(IMDlog, "MYMDD > Send energies (Time step=%d)\n" , i);
+                    fprintf(IMDlog, "MYMDD > ================================\n");
+                    fprintf(IMDlog, "MYMDD >   \n");
+                    fprintf(IMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
+                    fprintf(IMDlog, "MYMDD >   [Cal] for energies, [K] for the temperature \n" );
+                    fprintf(IMDlog, "MYMDD >   [Bar] for pressure\n" );
+                    fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
+                    fprintf(IMDlog, "MYMDD >  \n");
+                    fprintf(IMDlog, "MYMDD >   VMD Energy List \n" );
+                    fprintf(IMDlog, "MYMDD >   --------------------\n");
+                    fprintf(IMDlog, "MYMDD >   Time step         [ ]   %12d\n", p_energies->tstep);
+                    fprintf(IMDlog, "MYMDD >   Temperature       [K]   %12.5e\n", p_energies->T);
+                    fprintf(IMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n", p_energies->Etot);
+                    fprintf(IMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n", p_energies->Ebond);
+                    fprintf(IMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n", p_energies->Eangle);
+                    fprintf(IMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n", p_energies->Epot);
+                    fprintf(IMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n", p_energies->Edihe);
+                    fprintf(IMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n", p_energies->Eimpr);
+                    fprintf(IMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n", p_energies->Evdw);
+                    fprintf(IMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n", p_energies->Eelec);
+                    fprintf(IMDlog, "MYMDD > \n");
+                }
+            }
+
+            // Send forces every "ffreq"
+            if ( (i % ffreq) == 0 )
+            {
+                IIMD_send_forces ( &N_forces, (const int* ) atoms_list, (const float *) forces_list );
+            }
         }
+#if !defined(_WIN32)
+        // Deals with keyboard events
+        if ( keyboard_event() )
+        {
+            key = (char) getchar();
+            switch ( key )
+            {
+            case 'q':
+                fprintf(IMDlog, "MYMDD > Stop simulation\n");
+                IIMD_send_kill();
+                cont = 0;
+                break;
+            case 'f':
+                fprintf(IMDlog, "MYMDD > Increment coords frequency \n");
+                ffreq++;
+                IIMD_send_trate( &ffreq );
+                break;
+            case 'p':
+                if (!pause)
+                {
+                    fprintf(IMDlog, "MYMDD > Starting pause \n");
+                }
+                else
+                {
+                    fprintf(IMDlog, "MYMDD > Ending pause \n");
+                }
+                IIMD_send_pause();
+                pause = !(pause);
+                break;
+            case 'd':
+                fprintf(IMDlog, "MYMDD > Disconnect \n");
+                IIMD_send_disconnect();
+                IIMD_terminate();
+                cont = 0;
+                break;
+            }
+        }
+#endif
+#if defined(_WIN32)
+        Sleep(500);
+#else
+        usleep(500000);
+#endif
+        i++;
+    }
 
-			// New energies
-			if ( IIMD_get_energies( &p_energies ) )
-				{
-				if (log)
-              {
-              fprintf(IMDlog, "MYMDD > \n");
-              fprintf(IMDlog, "MYMDD > Send energies (Time step=%d)\n" , i);
-              fprintf(IMDlog, "MYMDD > ================================\n");
-              fprintf(IMDlog, "MYMDD >   \n");
-              fprintf(IMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
-              fprintf(IMDlog, "MYMDD >   [Cal] for energies, [K] for the temperature \n" );
-              fprintf(IMDlog, "MYMDD >   [Bar] for pressure\n" );
-              fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
-              fprintf(IMDlog, "MYMDD >  \n");
-              fprintf(IMDlog, "MYMDD >   VMD Energy List \n" );
-              fprintf(IMDlog, "MYMDD >   --------------------\n");
-              fprintf(IMDlog, "MYMDD >   Time step         [ ]   %12d\n",p_energies->tstep);
-              fprintf(IMDlog, "MYMDD >   Temperature       [K]   %12.5e\n", p_energies->T);
-              fprintf(IMDlog, "MYMDD >   Total E.          [Cal] %12.5e\n", p_energies->Etot);
-              fprintf(IMDlog, "MYMDD >   Bond E.           [Cal] %12.5e\n",p_energies->Ebond);
-              fprintf(IMDlog, "MYMDD >   Angle E.          [Cal] %12.5e\n",p_energies->Eangle);
-              fprintf(IMDlog, "MYMDD >   Potential E.      [Cal] %12.5e\n", p_energies->Epot);
-              fprintf(IMDlog, "MYMDD >   Dihedrale E.      [Cal] %12.5e\n", p_energies->Edihe);
-              fprintf(IMDlog, "MYMDD >   Improp. Dihed. E. [Cal] %12.5e\n",p_energies->Eimpr);
-              fprintf(IMDlog, "MYMDD >   Van der Waals E.  [Cal] %12.5e\n",p_energies->Evdw);
-              fprintf(IMDlog, "MYMDD >   Electrostatic. E. [Cal] %12.5e\n",p_energies->Eelec);
-              fprintf(IMDlog, "MYMDD > \n");
-              }
-				}
-
-			// Send forces every "ffreq"
-			if ( (i % ffreq) == 0 )
-				{
-				IIMD_send_forces ( &N_forces, (const int* ) atoms_list,(const float *) forces_list );
-				}
-			}
-		#if !defined(_WIN32)
-		// Deals with keyboard events
-		if ( keyboard_event() )
-			{
-			key = (char) getchar();
-			switch( key )
-				{
-				case 'q':
-					fprintf(IMDlog, "MYMDD > Stop simulation\n");
-					IIMD_send_kill();
-					cont = 0;
-				break;
-				case 'f':
-					fprintf(IMDlog, "MYMDD > Increment coords frequency \n");
-					ffreq++;
-					IIMD_send_trate( &ffreq );
-				break;
-				case 'p':
-					if (!pause)
-						{
-						fprintf(IMDlog, "MYMDD > Starting pause \n");
-						}
-					else
-						{
-						fprintf(IMDlog, "MYMDD > Ending pause \n");
-						}
-					IIMD_send_pause();
-					pause = !(pause);
-				break;
-				case 'd':
-					fprintf(IMDlog, "MYMDD > Disconnect \n");
-					IIMD_send_disconnect();
-					IIMD_terminate();
-					cont = 0;
-				break;
-				}
-			}
-		#endif
-		#if defined(_WIN32)
-			Sleep(500);
-		#else
-			usleep(500000);
-		#endif
-		i++;
-		}
-
-		IIMD_terminate ();
-		exit(0);
-	}
+    IIMD_terminate ();
+    exit(0);
+}

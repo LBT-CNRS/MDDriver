@@ -47,8 +47,8 @@ typedef short   imd_int32;
 typedef long long  imd_int64;
 
 
-typedef enum IMDType_t 
-	{
+typedef enum IMDType_t
+{
 	IMD_DISCONNECT,   //!< close IMD connection, leaving sim running
 	IMD_ENERGIES,     //!< energy data block
 	IMD_FCOORDS,      //!< atom coordinates
@@ -59,7 +59,7 @@ typedef enum IMDType_t
 	IMD_PAUSE,        //!< pause the running simulation
 	IMD_TRATE,        //!< set IMD update transmission rate
 	IMD_IOERROR       //!< indicate an I/O error
-	} IMDType;
+} IMDType;
 
 
 /*! \brief Energy exchange
@@ -69,8 +69,8 @@ typedef enum IMDType_t
  */
 
 
-typedef struct 
-	{
+typedef struct
+{
 	imd_int32 tstep;  //!< integer timestep index
 	float T;          //!< Temperature in degrees Kelvin
 	float Etot;       //!< Total energy, in Kcal/mol
@@ -81,7 +81,7 @@ typedef struct
 	float Eangle;     //!< Angle energy, Kcal/mol
 	float Edihe;      //!< Dihedral energy, Kcal/mol
 	float Eimpr;      //!< Improper energy, Kcal/mol
-	} IMDEnergies;
+} IMDEnergies;
 
 // Swap little <-> big endian
 //extern void imd_swap4(char *data, int ndata);
@@ -110,15 +110,15 @@ extern int imd_send_energies(void *, const IMDEnergies *);
  */
 extern int imd_send_fcoords(void *, imd_int32, const float *);
 
-/*! 
- *  recv_handshake returns 0 if server and client have the same relative 
+/*!
+ *  recv_handshake returns 0 if server and client have the same relative
  *  endianism; returns 1 if they have opposite endianism, and -1 if there
  *  was an error in the handshake process.
  */
 extern int imd_recv_handshake(void *);
 
 /*!
- *  Receive header and data 
+ *  Receive header and data
  */
 extern IMDType imd_recv_header(void *, imd_int32 *);
 

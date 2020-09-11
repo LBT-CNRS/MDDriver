@@ -81,7 +81,7 @@ API void MDDriver_pause(MDDriverAdapter *mddinstance);
 API void MDDriver_play(MDDriverAdapter *mddinstance);
 API void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float *forceslist);
 API void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies);
-API void MDDriver_loop(MDDriverAdapter *mddinstance);
+API int MDDriver_loop(MDDriverAdapter *mddinstance);
 API void MDDriver_disconnect(MDDriverAdapter *mddinstance);
 
 #ifdef __cplusplus
@@ -225,10 +225,13 @@ void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies) {
     energies->Eimpr = curE->Eimpr;
 }
 
-void MDDriver_loop(MDDriverAdapter *mddinstance) {
+int MDDriver_loop(MDDriverAdapter *mddinstance) {
+    if (!IIMD_probeconnection())
+        return 0;
     IIMD_treatprotocol();
 
     if (mddinstance->nb_forces != 0) {
         IIMD_send_forces( &(mddinstance->nb_forces), mddinstance->forces_atoms_list, mddinstance->forces_list);
     }
+    return 1;
 }
