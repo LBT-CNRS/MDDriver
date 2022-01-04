@@ -84,9 +84,11 @@ float coords[N][NDIM] =
 };
 
 // my_imd configuration
-static int   MYIMDdebug  = 0;
+static int   MYIMDdebug  = 1;
 static FILE *MYIMDlog;
+static int   MYIMDstop  = 0;
 static       IMDEnergies energies; // Communication buffer for energies
+static       IMDGrid grid; // Communication buffer for energies
 
 int nstximd              = 0;
 int myimd_wait           = 1;
@@ -118,6 +120,23 @@ void myimd_send_energies(int step_)
 	energies.Ebond = energies.Eangle = energies.Edihe = energies.Eimpr  = 0;
 	IIMD_send_energies( &energies );
 }
+
+void myimd_send_grid(int step_)
+{	// --- Send some energy information via MDD ---
+	grid.tstep  = step_;
+	grid.Xorigin=grid.Xorigin=grid.Xorigin=0.5;
+
+	grid.XdirectionX=grid.XdirectionX=grid.ZdirectionX=1.0;
+	grid.XdirectionY=grid.YdirectionY=grid.ZdirectionY=2.0;
+	grid.XdirectionZ=grid.YdirectionZ=grid.ZdirectionZ=3.0;
+
+	grid.nbcellx=grid.nbcelly=grid.nbcellz=4;
+
+	grid.sizecellx=grid.sizecelly=grid.sizecellz=1.5;
+
+	IIMD_send_grid( &grid );
+}
+
 
 void myimd_ext_forces( )
 {	// --- Receive some information about user applied forces via MDD ---
@@ -165,6 +184,7 @@ int main()                                                      // -- THIS IS TH
 		my_calculation(coords);
 		myimd_send_traj(&n, *coords);    // send our coordinates
 		myimd_send_energies(i);          // send our energies
+		//myimd_send_grid(i);          // send our grid
 		myimd_ext_forces();              // receive VMD's forces
 		// implement condition to exit this loop end finish execution
 	}

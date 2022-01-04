@@ -210,6 +210,8 @@ const double NmToAngstrom     = 10.0;
 
 // Communication buffer for energies
 static IMDEnergies energies;
+// Communication buffer for grid
+static IMDGrid grid;
 
 int nstximd              = 0;
 int myimd_wait           = 1;
@@ -320,6 +322,48 @@ void myimd_send_energies(int step_)
 	// SEND ENERGIES
 	IIMD_send_energies( &energies );
 	// More complex routines like for gromacs/MYIMD_send_energies can do...
+	// ..whatever you want, for example unit conversion
+}
+
+// Send some grid information via MDD; this should only be done on the master process
+// if we are in a parallel calculation module (MPI and such)
+void myimd_send_grid(int step_)
+{
+	grid.tstep  = step_;
+	grid.Xorigin=grid.Xorigin=grid.Xorigin=0.5;
+
+	grid.XdirectionX=grid.XdirectionX=grid.ZdirectionX=1.0;
+	grid.XdirectionY=grid.YdirectionY=grid.ZdirectionY=2.0;
+	grid.XdirectionZ=grid.YdirectionZ=grid.ZdirectionZ=3.0;
+
+	grid.nbcellx=grid.nbcelly=grid.nbcellz=4;
+
+	grid.sizecellx=grid.sizecelly=grid.sizecellz=1.5;
+
+	// should we print the grid to the log file?
+	if ( MYIMDdebug )
+	{
+
+		fprintf(MYIMDlog, "MYMDD > \n");
+		fprintf(MYIMDlog, "MYMDD > Send grid (Time step=%d)\n" , step_);
+		fprintf(MYIMDlog, "MYMDD > ================================\n");
+		fprintf(MYIMDlog, "MYMDD >   \n");
+		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM Grid  \n");
+		fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
+		fprintf(MYIMDlog, "MYMDD >  \n");
+		fprintf(MYIMDlog, "MYMDD >   Simulation grid info \n" );
+		fprintf(MYIMDlog, "MYMDD >   --------------------\n");
+		fprintf(MYIMDlog, "MYMDD >   Origin %f, %f, %f\n", grid.Xorigin, grid.Yorigin, grid.Zorigin);
+		fprintf(MYIMDlog, "MYMDD >   Direction X %f, %f, %f\n", grid.XdirectionX, grid.XdirectionX, grid.XdirectionX);
+		fprintf(MYIMDlog, "MYMDD >   Direction Y %f, %f, %f\n", grid.XdirectionY, grid.XdirectionY, grid.XdirectionY);
+		fprintf(MYIMDlog, "MYMDD >   Direction Z %f, %f, %f\n", grid.XdirectionZ, grid.YdirectionZ, grid.ZdirectionZ);
+		fprintf(MYIMDlog, "MYMDD >   Number of cells  %d, %d, %d\n", grid.nbcellx, grid.nbcelly, grid.nbcellz);
+		fprintf(MYIMDlog, "MYMDD >   Number of cells  %f, %f, %f\n", grid.sizecellx, grid.sizecelly, grid.sizecellz);
+		fprintf(MYIMDlog, "MYMDD > \n");
+	}
+
+	// SEND GRID
+	IIMD_send_grid( &grid );
 	// ..whatever you want, for example unit conversion
 }
 
@@ -470,6 +514,7 @@ int main()
 			// DO THE "IMD"
 			myimd_send_traj(&n, *tmpcoords); // send our coordinates
 			myimd_send_energies(i);          // send our energies
+			myimd_send_grid(i);          // send our energies
 			myimd_ext_forces();              // receive VMD's forces
 		}
 		// Treats extra events
