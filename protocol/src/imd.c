@@ -241,6 +241,19 @@ int imd_send_energies(void *s, const IMDEnergies *energies)
 	return rc;
 }
 
+int imd_send_grid(void *s, const IMDGrid *grid)
+{
+	int rc;
+	imd_int32 size = HEADERSIZE + sizeof(IMDGrid);
+	char *buf = (char *) malloc(sizeof(char) * size);
+	fill_header((IMDheader *)buf, IMD_GRID, 1);
+	memcpy(buf + HEADERSIZE, grid, sizeof(IMDGrid));
+	rc = (imd_writen(s, buf, size) != size);
+	free(buf);
+	return rc;
+}
+
+
 int imd_send_fcoords(void *s, imd_int32 n, const float *coords)
 {
 	int rc;
@@ -318,8 +331,13 @@ int imd_recv_energies(void *s, IMDEnergies *energies)
 	return (imd_readn(s, (char *)energies, sizeof(IMDEnergies)) != sizeof(IMDEnergies));
 }
 
+int imd_recv_grid(void *s, IMDGrid *grid)
+{
+	return (imd_readn(s, (char *)grid, sizeof(IMDGrid)) != sizeof(IMDGrid));
+}
+
+
 int imd_recv_fcoords(void *s, imd_int32 n, float *coords)
 {
 	return (imd_readn(s, (char *)coords, 12 * n) != 12 * n);
 }
-
