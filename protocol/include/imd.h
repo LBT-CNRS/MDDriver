@@ -58,7 +58,8 @@ typedef enum IMDType_t
 	IMD_MDCOMM,       //!< MDComm style force data
 	IMD_PAUSE,        //!< pause the running simulation
 	IMD_TRATE,        //!< set IMD update transmission rate
-	IMD_IOERROR       //!< indicate an I/O error
+	IMD_IOERROR,       //!< indicate an I/O error
+	IMD_GRID       		//!< grid data block
 } IMDType;
 
 
@@ -83,6 +84,37 @@ typedef struct
 	float Eimpr;      //!< Improper energy, Kcal/mol
 } IMDEnergies;
 
+typedef struct
+{
+	imd_int32 tstep;  //!< integer timestep index
+
+	float Xorigin;   //!< Grid origin X
+	float Yorigin;   //!< Grid origin Y
+	float Zorigin;   //!< Grid origin Z
+
+	float XdirectionX;   //!< X component X vector direction of the grid frame (right hand frame)
+	float YdirectionX;   //!< Y component X vector direction of the grid frame (right hand frame)
+	float ZdirectionX;   //!< Z component X vector direction of the grid frame (right hand frame)
+
+	float XdirectionY;   //!< X component Y vector direction of the grid frame (right hand frame)
+	float YdirectionY;   //!< Y component Y vector direction of the grid frame (right hand frame)
+	float ZdirectionY;   //!< Z component Y vector direction of the grid frame (right hand frame)
+
+	float XdirectionZ;   //!< X component Z vector direction of the grid frame (right hand frame)
+	float YdirectionZ;   //!< Y component Z vector direction of the grid frame (right hand frame)
+	float ZdirectionZ;   //!< Z component Z vector direction of the grid frame (right hand frame)
+
+	imd_int32 nbcellx;         //!< Number of cells along X axis
+	imd_int32 nbcelly;         //!< Number of cells along Y axis
+	imd_int32 nbcellz;         //!< Number of cells along Z axis
+
+	float sizecellx;     //!< Size of the cell on x axis
+	float sizecelly;     //!< Size of the cell on y axis
+	float sizecellz;     //!< Size of the cell on z axis
+} IMDGrid;
+
+
+
 // Swap little <-> big endian
 //extern void imd_swap4(char *data, int ndata);
 extern void imd_swap4(void *data, long ndata);
@@ -103,6 +135,10 @@ extern int imd_send_mdcomm(void *, imd_int32, const imd_int32 *, const float *);
 
 //! Send energies
 extern int imd_send_energies(void *, const IMDEnergies *);
+
+//! Send grid
+extern int imd_send_grid(void *, const IMDGrid *);
+
 
 /*!
  *  Send atom forces and coordinates
@@ -134,10 +170,15 @@ extern int imd_recv_mdcomm(void *, imd_int32, imd_int32 *, float *);
 extern int imd_recv_energies(void *, IMDEnergies *);
 
 /*!
+ *  Receive grid
+ */
+extern int imd_recv_grid(void *, IMDGrid *);
+
+
+/*!
  *  Receive atom coordinates and forces
  *  Forces are in Kcal/mol/angstrom
  */
 extern int imd_recv_fcoords(void *, imd_int32, float *);
 
 #endif
-
