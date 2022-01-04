@@ -64,10 +64,12 @@ extern imd_int64 imd_value;
 #define  IIMD_treatevent          iimd_treateven_
 #define  IIMD_send_coords         iimd_send_coords_
 #define  IIMD_send_energies       iimd_send_energies_
+#define  IIMD_send_grid           iimd_send_grid_
 #define  IIMD_send_energy_array   iimd_send_energy_array_
 #define  IIMD_send_forces         iimd_send_forces_
 #define  IIMD_get_coords          iimd_get_coords_
 #define  IIMD_get_energies        iimd_get_energies_
+#define  IIMD_get_grid            iimd_get_grid_
 #define  IIMD_get_forces          iimd_get_forces_
 #define  IIMD_terminate           iimd_terminate_
 #else
@@ -77,10 +79,12 @@ extern imd_int64 imd_value;
 #define  IIMD_treatevent          iimd_treateven
 #define  IIMD_send_coords         iimd_send_coords
 #define  IIMD_send_energies       iimd_send_energies
+#define  IIMD_send_grid           iimd_send_grid
 #define  IIMD_send_energy_array   iimd_send_energy_array
 #define  IIMD_send_forces         iimd_send_forces
 #define  IIMD_get_coords          iimd_get_coords
 #define  IIMD_get_energies        iimd_get_energies
+#define  IIMD_get_grid            iimd_get_grid
 #define  IIMD_get_forces          iimd_get_forces
 #define  IIMD_terminate           iimd_terminate
 #endif
@@ -127,6 +131,13 @@ Send molecular system energies on network
 @param energies energiesof the molecular system
 */
 extern void  IIMD_send_energies     ( const IMDEnergies *energies );
+
+/**
+Send grid around simulated molecule
+@param grid around the molecular system
+*/
+extern void  IIMD_send_grid     ( const IMDGrid *grid );
+
 
 /**
 Send molecular system energies computed at each timestep on network
@@ -180,11 +191,19 @@ Get energies of the molecular system
 extern int   IIMD_get_energies      ( IMDEnergies **energ_ );
 
 /**
+Get grid around the molecular system
+@param grid_ grid around the molecular system
+@return id grid are avalaible return 1 else return 0
+*/
+extern int   IIMD_get_grid      ( IMDGrid **grid_ );
+
+
+/**
 Get forces apply on the atoms of the molecular system
 @param n_atoms number of atoms on which a force is applying
 @param atom_list atom id arrays on which a force is applying(the array have n_atoms integers)
 @param force_list x y z force components applying on each atom in the atom_list id array (this array must have n_atoms*3 floats)
-@return if energy is avalaible return 1 else return 0
+@return if forces is avalaible return 1 else return 0
 */
 extern int   IIMD_get_forces        ( imd_int32 *n_atoms, imd_int32 **atom_list, float     **force_list);
 
