@@ -130,8 +130,10 @@ static imd_int32   *vmd_atoms  = 0;
 static float       *vmd_forces = 0;
 static float       *vmd_coords = 0;
 static IMDEnergies  vmd_energies;
+static IMDGrid      vmd_grid;
 static imd_int32    vmd_new_coords = 0;
 static imd_int32    vmd_new_energies = 0;
+static imd_int32    vmd_new_grid = 0;
 
 //-------------------------------------------------------
 //
@@ -517,7 +519,13 @@ void IIMD_treatprotocol()
 
 					break;
 				}
+				case IMD_GRID:
+				{
+					IMDGrid dummy;
+					imd_recv_grid(clientsock, &dummy);
 
+					break;
+				}
 				case IMD_FCOORDS:
 					//
 					vmd_coords = (float* )malloc( sizeof(float) * 3 * vmd_length );
@@ -576,6 +584,21 @@ void IIMD_treatprotocol()
 					vmd_new_energies = 1;
 				}
 				break;
+			case IMD_GRID:
+					if (imd_recv_grid(sock, &vmd_grid))
+					{
+						fprintf(IMDlog, "MDDriver >      \n");
+						fprintf(IMDlog, "MDDriver >      Cannot read grid - disconnecting \n");
+						disconnect( sock );
+					}
+					else
+					{
+						if ( IMDswap ) imd_swap4((char *) &vmd_grid, sizeof(vmd_energies) / 4);
+						vmd_new_grid = 1;
+					}
+					break;
+
+
 			case IMD_DISCONNECT:
 				fprintf(IMDlog, "MDDriver >      \n");
 				fprintf(IMDlog, "MDDriver >      Connection detached\n");
@@ -697,7 +720,7 @@ FILE *IIMD_init( const char  *hostname,     imd_int32   *mode,  imd_int32   *IMD
 	{
 		if ( vmdsock_connect(sock, hostname, IMDport) < 0 )
 		{
-			fprintf(IMDlog, "MDDriver >      Unable to connect to server %s:%d   %d\n", hostname, IMDport);
+			fprintf(IMDlog, "MDDriver >      Unable to connect to server %s:%d   \n", hostname, IMDport);
 			vmdsock_destroy(sock);
 			sock = 0;
 		}
@@ -861,6 +884,39 @@ void IIMD_send_energies(const IMDEnergies *energies)
 	if (IMDmsg >= 1)
 		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
 }
+
+void IIMD_send_grid(const IMDGrid *grid)
+{
+	int i;
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+	if (IMDmsg >= 2)
+	{
+		fprintf(IMDlog, "MDDriver > \n");
+		fprintf(IMDlog, "MDDriver >   Simulation grid info \n" );
+		fprintf(IMDlog, "MDDriver >   --------------------\n");
+		fprintf(IMDlog, "MDDriver >   Origin %f, %f, %f\n", vmd_grid.Xorigin, vmd_grid.Yorigin, vmd_grid.Zorigin);
+		fprintf(IMDlog, "MDDriver >   Direction X %f, %f, %f\n", vmd_grid.XdirectionX, vmd_grid.XdirectionX, vmd_grid.XdirectionX);
+		fprintf(IMDlog, "MDDriver >   Direction Y %f, %f, %f\n", vmd_grid.XdirectionY, vmd_grid.XdirectionY, vmd_grid.XdirectionY);
+		fprintf(IMDlog, "MDDriver >   Direction Z %f, %f, %f\n", vmd_grid.XdirectionZ, vmd_grid.YdirectionZ, vmd_grid.ZdirectionZ);
+		fprintf(IMDlog, "MDDriver >   Number of cells  %d, %d, %d\n", vmd_grid.nbcellx, vmd_grid.nbcelly, vmd_grid.nbcellz);
+		fprintf(IMDlog, "MDDriver >   Number of cells  %f, %f, %f\n", vmd_grid.sizecellx, vmd_grid.sizecelly, vmd_grid.sizecellz);
+		fprintf(IMDlog, "MDDriver > \n");
+	}
+
+	for (i = 0; i < SL_NSockets; i++)
+	{
+		void *clientsock = SL_SocketList[i];
+		if (!clientsock || !vmdsock_selwrite(clientsock, 0)) continue;
+		imd_send_grid(clientsock, grid);
+	}
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+}
+
 
 void IIMD_send_energies_array(const imd_int32 *tstep_, const float *energies_)
 {
@@ -1145,6 +1201,43 @@ int IIMD_get_energies( IMDEnergies **energ_ )
 	return rc;
 }
 
+int IIMD_get_grid( IMDGrid **grid_ )
+{
+	int rc = 0;
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+	//Update the energ pointer even if no new energies
+	*grid_ = &vmd_grid;
+
+	if ( vmd_new_grid )
+	{
+		rc = 1 ;
+
+		if (IMDmsg >= 2)
+		{
+			fprintf(IMDlog, "MDDriver > \n");
+			fprintf(IMDlog, "MDDriver >   Simulation grid info \n" );
+			fprintf(IMDlog, "MDDriver >   --------------------\n");
+			fprintf(IMDlog, "MDDriver >   Origin %f, %f, %f\n", vmd_grid.Xorigin, vmd_grid.Yorigin, vmd_grid.Zorigin);
+			fprintf(IMDlog, "MDDriver >   Direction X %f, %f, %f\n", vmd_grid.XdirectionX, vmd_grid.XdirectionX, vmd_grid.XdirectionX);
+			fprintf(IMDlog, "MDDriver >   Direction Y %f, %f, %f\n", vmd_grid.XdirectionY, vmd_grid.XdirectionY, vmd_grid.XdirectionY);
+			fprintf(IMDlog, "MDDriver >   Direction Z %f, %f, %f\n", vmd_grid.XdirectionZ, vmd_grid.YdirectionZ, vmd_grid.ZdirectionZ);
+			fprintf(IMDlog, "MDDriver >   Number of cells  %d, %d, %d\n", vmd_grid.nbcellx, vmd_grid.nbcelly, vmd_grid.nbcellz);
+			fprintf(IMDlog, "MDDriver >   Number of cells  %f, %f, %f\n", vmd_grid.sizecellx, vmd_grid.sizecelly, vmd_grid.sizecellz);
+			fprintf(IMDlog, "MDDriver > \n");
+
+		}
+	}
+
+
+	vmd_new_grid = 0;
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+	return rc;
+}
+
 
 void IIMD_terminate()
 {
@@ -1162,6 +1255,7 @@ void IIMD_terminate()
 	vmd_coords = 0;
 	vmd_new_coords = 0;
 	vmd_new_energies = 0;
+	vmd_new_grid = 0;
 	if (sock) {
 		vmdsock_shutdown(sock);
 		vmdsock_destroy(sock);
