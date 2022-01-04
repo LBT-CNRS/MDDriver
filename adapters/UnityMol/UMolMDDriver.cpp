@@ -48,18 +48,26 @@ typedef float t_coord[3];
 
 class MDDriverAdapter {
 public:
-    int N_atoms = 0;
+    int N_atoms;
     t_coord *coords;
     FILE *MYIMDlog;
 
-    int nb_forces = 0;
-    float *forces_list = NULL;
-    int *forces_atoms_list = NULL;
+    int nb_forces ;
+    float *forces_list ;
+    int *forces_atoms_list ;
 
     MDDriverAdapter();
 };
 
-MDDriverAdapter::MDDriverAdapter() {
+MDDriverAdapter::MDDriverAdapter()
+{
+  int N_atoms = 0;
+  t_coord *coords;
+  FILE *MYIMDlog;
+
+  int nb_forces = 0;
+  float *forces_list = NULL;
+  int *forces_atoms_list = NULL;
 }
 
 void MDDriver_freeForces(MDDriverAdapter *mddinstance);
