@@ -138,14 +138,14 @@ int main()
 
     int N_forces = N_FORCE;
     int   atoms_list[N_FORCE];//Force
-    float forces_list[N_FORCE][3];
+    float forces_list[N_FORCE*3];
 
     int cont   = 1;                     // Main loop control
     int ffreq  = 10;
     int i;
 
     IMDEnergies *p_energies;            // Energies
-
+    IMDGrid *p_grid; //grid
     int j;
     char key;
 
@@ -155,25 +155,25 @@ int main()
     atoms_list[3] = 4;
     atoms_list[4] = 2;
 
-    forces_list[0][0] = 10.0;
-    forces_list[0][1] = -1.0;
-    forces_list[0][2] = 1.0;
+    forces_list[0*3+0] = 10.0;
+    forces_list[0*3+1] = -1.0;
+    forces_list[0*3+2] = 1.0;
 
-    forces_list[1][0] = 2.0;
-    forces_list[1][1] = -1.0;
-    forces_list[1][2] = 1.0;
+    forces_list[1*3+0] = 2.0;
+    forces_list[1*3+1] = -1.0;
+    forces_list[1*3+2] = 1.0;
 
-    forces_list[2][0] = 4.0;
-    forces_list[2][1] = -1.0;
-    forces_list[2][2] = 1.0;
+    forces_list[2*3+0] = 4.0;
+    forces_list[2*3+1] = -1.0;
+    forces_list[2*3+2] = 1.0;
 
-    forces_list[3][0] = 8.0;
-    forces_list[3][1] = -1.0;
-    forces_list[3][2] = 1.0;
+    forces_list[3*3+0] = 8.0;
+    forces_list[3*3+1] = -1.0;
+    forces_list[3*3+2] = 1.0;
 
-    forces_list[4][0] = 10.0;
-    forces_list[4][1] = 6.0;
-    forces_list[4][2] = 1.0;
+    forces_list[4*3+0] = 10.0;
+    forces_list[4*3+1] = 6.0;
+    forces_list[4*3+2] = 1.0;
 
     connection();
 
@@ -218,7 +218,7 @@ int main()
                     fprintf(IMDlog, "MYMDD >   [Bar] for pressure\n" );
                     fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
                     fprintf(IMDlog, "MYMDD >  \n");
-                    fprintf(IMDlog, "MYMDD >   VMD Energy List \n" );
+                    fprintf(IMDlog, "MYMDD >   Simulation energy List \n" );
                     fprintf(IMDlog, "MYMDD >   --------------------\n");
                     fprintf(IMDlog, "MYMDD >   Time step         [ ]   %12d\n", p_energies->tstep);
                     fprintf(IMDlog, "MYMDD >   Temperature       [K]   %12.5e\n", p_energies->T);
@@ -233,11 +233,32 @@ int main()
                     fprintf(IMDlog, "MYMDD > \n");
                 }
             }
-
+            if ( IIMD_get_grid( &p_grid ) )
+            {
+                if (log)
+                {
+                    fprintf(IMDlog, "MYMDD > \n");
+                    fprintf(IMDlog, "MYMDD > Send grid (Time step=%d)\n" , i);
+                    fprintf(IMDlog, "MYMDD > ================================\n");
+                    fprintf(IMDlog, "MYMDD >   \n");
+                    fprintf(IMDlog, "MYMDD >   MYPROGRAM Grid  \n");
+                    fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
+                    fprintf(IMDlog, "MYMDD >  \n");
+                    fprintf(IMDlog, "MYMDD >   Simulation grid info \n" );
+                    fprintf(IMDlog, "MYMDD >   --------------------\n");
+                    fprintf(IMDlog, "MYMDD >   Origin %f, %f, %f\n", p_grid->Xorigin, p_grid->Yorigin, p_grid->Zorigin);
+                    fprintf(IMDlog, "MYMDD >   Direction X %f, %f, %f\n", p_grid->XdirectionX, p_grid->XdirectionX, p_grid->XdirectionX);
+                    fprintf(IMDlog, "MYMDD >   Direction Y %f, %f, %f\n", p_grid->XdirectionY, p_grid->XdirectionY, p_grid->XdirectionY);
+                    fprintf(IMDlog, "MYMDD >   Direction Z %f, %f, %f\n", p_grid->XdirectionZ, p_grid->YdirectionZ, p_grid->ZdirectionZ);
+                    fprintf(IMDlog, "MYMDD >   Number of cells  %d, %d, %d\n", p_grid->nbcellx, p_grid->nbcelly, p_grid->nbcellz);
+                    fprintf(IMDlog, "MYMDD >   Number of cells  %f, %f, %f\n", p_grid->sizecellx, p_grid->sizecelly, p_grid->sizecellz);
+                    fprintf(IMDlog, "MYMDD > \n");
+                }
+            }
             // Send forces every "ffreq"
             if ( (i % ffreq) == 0 )
             {
-                IIMD_send_forces ( &N_forces, (const int* ) atoms_list, (const float *) forces_list );
+                IIMD_send_forces ( &N_forces, atoms_list, forces_list );
             }
         }
 #if !defined(_WIN32)
