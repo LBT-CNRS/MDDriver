@@ -240,12 +240,14 @@ int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *coordinates, int 
 int MDDriver_getCustomFloat(MDDriverAdapter *mddinstance, char * datanamefloat, float *customfloat, int nbfloat) {
     IIMD_get_custom_float(&(mddinstance->datanamefloat),  &(mddinstance->N_floats), (float **) & (mddinstance->customfloat) );
     memcpy(customfloat, mddinstance->customfloat, nbfloat * sizeof(float));
+    memcpy(datanamefloat, mddinstance->datanamefloat, 8 * sizeof(char));
     return nbfloat;
 }
 
 int MDDriver_getCustomInt(MDDriverAdapter *mddinstance, char * datanameint, int * customint, int nbint) {
   IIMD_get_custom_float(&(mddinstance->datanameint) , &(mddinstance->N_ints), (float **) & (mddinstance->customint) );
   memcpy(customint, mddinstance->customint, nbint * sizeof(int));
+  memcpy(datanameint, mddinstance->datanameint, 8 * sizeof(char));
   return nbint;
 }
 
