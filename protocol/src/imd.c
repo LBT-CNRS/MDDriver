@@ -36,6 +36,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 //! Header for IMD connections
 typedef struct
@@ -44,8 +45,8 @@ typedef struct
 	imd_int32 length;
 } IMDheader;
 
-#define HEADERSIZE 8
-#define IMDVERSION 2
+
+
 
 /* Only works with aligned 4-byte quantities, will cause a bus error */
 /* on some platforms if used on unaligned data.                      */
@@ -229,6 +230,34 @@ int imd_send_mdcomm(void *s, imd_int32 n, const imd_int32 *indices, const float 
 	return rc;
 }
 
+int imd_send_custom_float(void * s, const char* dataname, imd_int32 n, const float * datafloat)
+{
+	int rc;
+	imd_int32 size = HEADERSIZE+DATANAME_SIZE + sizeof(float) * n;
+	char *buf = (char *) malloc(sizeof(char) * size);
+	fill_header((IMDheader *)buf, IMD_CUSTOM_FLOAT, n);
+	memcpy(buf + HEADERSIZE, dataname, DATANAME_SIZE);
+	memcpy(buf + HEADERSIZE+DATANAME_SIZE, datafloat, sizeof(float) *n);
+	rc = (imd_writen(s, buf, size) != size);
+	free(buf);
+	return rc;
+}
+
+int imd_send_custom_int(void * s, const char* dataname, imd_int32 n, const imd_int32 * dataint)
+{
+	int rc;
+	imd_int32 size = HEADERSIZE+DATANAME_SIZE + 4 * n;
+	char *buf = (char *) malloc(sizeof(char) * size);
+	fill_header((IMDheader *)buf, IMD_CUSTOM_INT, n);
+	memcpy(buf + HEADERSIZE, dataname, DATANAME_SIZE);
+	memcpy(buf + HEADERSIZE+DATANAME_SIZE, dataint, 4*n);
+	rc = (imd_writen(s, buf, size) != size);
+	free(buf);
+	return rc;
+
+}
+
+
 int imd_send_energies(void *s, const IMDEnergies *energies)
 {
 	int rc;
@@ -265,6 +294,8 @@ int imd_send_fcoords(void *s, imd_int32 n, const float *coords)
 	free(buf);
 	return rc;
 }
+
+
 
 /* The IMD receive functions */
 IMDType imd_recv_header_nolengthswap(void *s, imd_int32 *length)
@@ -325,6 +356,21 @@ int imd_recv_mdcomm(void *s, imd_int32 n, imd_int32 *indices, float *forces)
 	if (imd_readn(s, (char *)forces, 12 * n) != 12 * n) return 1;
 	return 0;
 }
+
+int imd_recv_custom_float(void * s,  char * dataname, imd_int32 n, float * datafloat)
+{
+if (imd_readn(s, (char *)dataname, DATANAME_SIZE) != DATANAME_SIZE) return 1;
+if (imd_readn(s, (char *)datafloat, sizeof(float) * n) != sizeof(float) * n) return 1;
+return 0;
+}
+
+int imd_recv_custom_int(void * s,  char * dataname, imd_int32 n, imd_int32 * dataint)
+{
+if (imd_readn(s, (char *)dataname, DATANAME_SIZE) != DATANAME_SIZE) return 1;
+if (imd_readn(s, (char *)dataint, sizeof(int) * n) != sizeof(int) * n) return 1;
+return 0;
+}
+
 
 int imd_recv_energies(void *s, IMDEnergies *energies)
 {

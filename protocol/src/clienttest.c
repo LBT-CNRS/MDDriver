@@ -64,6 +64,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #if defined(_WIN32)
 #include <windows.h>
@@ -91,7 +92,7 @@ typedef float t_coord[3];
 FILE *IMDlog;
 char IMDhostname[] = "localhost";
 int IMDport   = 3000;
-int IMDmsg = 0;
+int IMDmsg = 2;
 int IMDwait   = 0;                     // Connection configuration
 int IMDmode = 0; // 0 : client , 1 : server
 
@@ -139,6 +140,14 @@ int main()
     int N_forces = N_FORCE;
     int   atoms_list[N_FORCE];//Force
     float forces_list[N_FORCE*3];
+
+    int nbfloat;
+    float * customfloat;
+    char * datanamefloat=(char *) malloc(sizeof(char)*8);
+
+    int nbint;
+    int * customint;
+    char * datanameint=(char *) malloc(sizeof(char)*8);
 
     int cont   = 1;                     // Main loop control
     int ffreq  = 10;
@@ -189,7 +198,7 @@ int main()
                 if (log)
                 {   //coords = *p_coords;
                     fprintf(IMDlog, "MYMDD > \n");
-                    fprintf(IMDlog, "MYMDD > Send %d atoms (Time step=%d)\n", N_atoms, i);
+                    fprintf(IMDlog, "MYMDD > Get %d atoms (Time step=%d)\n", N_atoms, i);
                     fprintf(IMDlog, "MYMDD > ================================\n");
                     fprintf(IMDlog, "MYMDD > \n");
                     fprintf(IMDlog, "MYMDD >  Force list (10 first atoms and the last one)\n");
@@ -210,7 +219,7 @@ int main()
                 if (log)
                 {
                     fprintf(IMDlog, "MYMDD > \n");
-                    fprintf(IMDlog, "MYMDD > Send energies (Time step=%d)\n" , i);
+                    fprintf(IMDlog, "MYMDD > Receive energies (Time step=%d)\n" , i);
                     fprintf(IMDlog, "MYMDD > ================================\n");
                     fprintf(IMDlog, "MYMDD >   \n");
                     fprintf(IMDlog, "MYMDD >   MYPROGRAM Energy List (%d) \n", 99 );
@@ -238,7 +247,7 @@ int main()
                 if (log)
                 {
                     fprintf(IMDlog, "MYMDD > \n");
-                    fprintf(IMDlog, "MYMDD > Send grid (Time step=%d)\n" , i);
+                    fprintf(IMDlog, "MYMDD > Receive grid (Time step=%d)\n" , i);
                     fprintf(IMDlog, "MYMDD > ================================\n");
                     fprintf(IMDlog, "MYMDD >   \n");
                     fprintf(IMDlog, "MYMDD >   MYPROGRAM Grid  \n");
@@ -247,6 +256,7 @@ int main()
                     fprintf(IMDlog, "MYMDD >   Simulation grid info \n" );
                     fprintf(IMDlog, "MYMDD >   --------------------\n");
                     fprintf(IMDlog, "MYMDD >   Origin %f, %f, %f\n", p_grid->Xorigin, p_grid->Yorigin, p_grid->Zorigin);
+                    fprintf(IMDlog, "MYMDD >   End %f, %f, %f\n", p_grid->Xend, p_grid->Yend, p_grid->Zend);
                     fprintf(IMDlog, "MYMDD >   Direction X %f, %f, %f\n", p_grid->XdirectionX, p_grid->XdirectionX, p_grid->XdirectionX);
                     fprintf(IMDlog, "MYMDD >   Direction Y %f, %f, %f\n", p_grid->XdirectionY, p_grid->XdirectionY, p_grid->XdirectionY);
                     fprintf(IMDlog, "MYMDD >   Direction Z %f, %f, %f\n", p_grid->XdirectionZ, p_grid->YdirectionZ, p_grid->ZdirectionZ);
@@ -255,6 +265,43 @@ int main()
                     fprintf(IMDlog, "MYMDD > \n");
                 }
             }
+
+            if ( IIMD_get_custom_float(&datanamefloat,  &nbfloat, (float **) &customfloat) )
+            {
+                if (log)
+                {
+                  fprintf(IMDlog, "MYMDD > \n");
+                  fprintf(IMDlog, "MYMDD > Receive float array (Time step=%d)\n" , i);
+                  fprintf(IMDlog, "MYMDD > ================================\n");
+                  fprintf(IMDlog, "MYMDD >   \n");
+                  fprintf(IMDlog, "MYMDD >   MYPROGRAM float array %s \n", datanamefloat);
+                  fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
+                  for (unsigned j = 0; j < nbfloat; j++)
+                    {
+                      fprintf(IMDlog, "MYMDD > float array[%d] = %f\n", j, customfloat[j]);
+                    }
+                  fprintf(IMDlog, "MYMDD > \n");
+                }
+            }
+            if ( IIMD_get_custom_int(&datanameint,  &nbint, (int **) &customint)  )
+            {
+                if (log)
+                {
+                  fprintf(IMDlog, "MYMDD > \n");
+                  fprintf(IMDlog, "MYMDD > Receive int array (Time step=%d)\n" , i);
+                  fprintf(IMDlog, "MYMDD > ================================\n");
+                  fprintf(IMDlog, "MYMDD >   \n");
+                  fprintf(IMDlog, "MYMDD >   MYPROGRAM int array %s \n", datanameint);
+                  fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
+                  for (unsigned j = 0; j < nbint; j++)
+                    {
+                      fprintf(IMDlog, "MYMDD > int array[%d] = %d\n", j, customint[j]);
+                    }
+                  fprintf(IMDlog, "MYMDD > \n");
+                }
+            }
+
+
             // Send forces every "ffreq"
             if ( (i % ffreq) == 0 )
             {

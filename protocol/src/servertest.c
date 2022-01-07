@@ -85,6 +85,24 @@
 //
 #define CURRCALC 1
 
+float custom_float[5] =
+{
+1.0,
+2.0,
+3.0,
+4.0,
+5.0
+};
+
+int custom_int[5] =
+{
+1,
+2,
+3,
+4,
+5
+};
+
 // Example coordinates for deca-alanine, 104 atoms, use test.pdb for visualization in VMD
 float coords[N][NDIM] =
 {
@@ -210,12 +228,14 @@ const double NmToAngstrom     = 10.0;
 
 // Communication buffer for energies
 static IMDEnergies energies;
+static int nbint;
+static int nbfloat;
 // Communication buffer for grid
 static IMDGrid grid;
 
 int nstximd              = 0;
 int myimd_wait           = 1;
-int myimd_log           = -1;
+int myimd_log           = 2;
 
 // If the value is negative, we will print debug output!
 int myimd_port           = 3000;
@@ -330,7 +350,8 @@ void myimd_send_energies(int step_)
 void myimd_send_grid(int step_)
 {
 	grid.tstep  = step_;
-	grid.Xorigin=grid.Xorigin=grid.Xorigin=0.5;
+	grid.Xorigin=grid.Yorigin=grid.Zorigin=0.5;
+	grid.Xend=grid.Yend=grid.Zend=2.5;
 
 	grid.XdirectionX=grid.XdirectionX=grid.ZdirectionX=1.0;
 	grid.XdirectionY=grid.YdirectionY=grid.ZdirectionY=2.0;
@@ -354,6 +375,7 @@ void myimd_send_grid(int step_)
 		fprintf(MYIMDlog, "MYMDD >   Simulation grid info \n" );
 		fprintf(MYIMDlog, "MYMDD >   --------------------\n");
 		fprintf(MYIMDlog, "MYMDD >   Origin %f, %f, %f\n", grid.Xorigin, grid.Yorigin, grid.Zorigin);
+		fprintf(MYIMDlog, "MYMDD >   Origin %f, %f, %f\n", grid.Xend, grid.Yend, grid.Zend);
 		fprintf(MYIMDlog, "MYMDD >   Direction X %f, %f, %f\n", grid.XdirectionX, grid.XdirectionX, grid.XdirectionX);
 		fprintf(MYIMDlog, "MYMDD >   Direction Y %f, %f, %f\n", grid.XdirectionY, grid.XdirectionY, grid.XdirectionY);
 		fprintf(MYIMDlog, "MYMDD >   Direction Z %f, %f, %f\n", grid.XdirectionZ, grid.YdirectionZ, grid.ZdirectionZ);
@@ -364,6 +386,54 @@ void myimd_send_grid(int step_)
 
 	// SEND GRID
 	IIMD_send_grid( &grid );
+	// ..whatever you want, for example unit conversion
+}
+
+// Send custom float
+void myimd_send_float(int step_)
+{
+
+	// should we print the grid to the log file?
+	if ( MYIMDdebug )
+	{
+
+		fprintf(MYIMDlog, "MYMDD > \n");
+		fprintf(MYIMDlog, "MYMDD > Send custom float (Time step=%d)\n" , step_);
+		fprintf(MYIMDlog, "MYMDD > ================================\n");
+		fprintf(MYIMDlog, "MYMDD >   \n");
+		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM custom float  \n");
+		fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
+		fprintf(MYIMDlog, "MYMDD >   Custom float %s %f, %f, %f, %f, %f\n", "myfloat" , custom_float[0],custom_float[1],custom_float[2], custom_float[3], custom_float[4]);
+		fprintf(MYIMDlog, "MYMDD > \n");
+	}
+
+	// SEND custom float
+	nbfloat = 5;
+	IIMD_send_custom_float("myfloat", &nbfloat, custom_float);
+	// ..whatever you want, for example unit conversion
+}
+
+// Send custom float
+void myimd_send_int(int step_)
+{
+
+	// should we print the grid to the log file?
+	if ( MYIMDdebug )
+	{
+
+		fprintf(MYIMDlog, "MYMDD > \n");
+		fprintf(MYIMDlog, "MYMDD > Send custom int (Time step=%d)\n" , step_);
+		fprintf(MYIMDlog, "MYMDD > ================================\n");
+		fprintf(MYIMDlog, "MYMDD >   \n");
+		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM custom int  \n");
+		fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
+		fprintf(MYIMDlog, "MYMDD >   Custom int %s %d, %d, %d, %d, %d\n", "myint" , custom_int[0],custom_int[1],custom_int[2], custom_int[3], custom_int[4]);
+		fprintf(MYIMDlog, "MYMDD > \n");
+	}
+
+	// SEND custom int
+	nbint = 5;
+	IIMD_send_custom_int("myint", &nbint, custom_int);
 	// ..whatever you want, for example unit conversion
 }
 
@@ -515,6 +585,8 @@ int main()
 			myimd_send_traj(&n, *tmpcoords); // send our coordinates
 			myimd_send_energies(i);          // send our energies
 			myimd_send_grid(i);          // send our energies
+			myimd_send_float(i);          // send float data
+			myimd_send_int(i);          // send int data
 			myimd_ext_forces();              // receive VMD's forces
 		}
 		// Treats extra events

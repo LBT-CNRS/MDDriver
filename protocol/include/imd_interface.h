@@ -67,6 +67,10 @@ extern imd_int64 imd_value;
 #define  IIMD_send_grid           iimd_send_grid_
 #define  IIMD_send_energy_array   iimd_send_energy_array_
 #define  IIMD_send_forces         iimd_send_forces_
+#define  IIMD_send_custom_float   iimd_send_custom_float_
+#define  IIMD_send_custom_int     iimd_send_custom_int_
+#define  IIMD_get_custom_float    iimd_get_custom_float_
+#define  IIMD_get_custom_int      iimd_get_custom_int_
 #define  IIMD_get_coords          iimd_get_coords_
 #define  IIMD_get_energies        iimd_get_energies_
 #define  IIMD_get_grid            iimd_get_grid_
@@ -82,6 +86,10 @@ extern imd_int64 imd_value;
 #define  IIMD_send_grid           iimd_send_grid
 #define  IIMD_send_energy_array   iimd_send_energy_array
 #define  IIMD_send_forces         iimd_send_forces
+#define  IIMD_send_custom_float   iimd_send_custom_float
+#define  IIMD_send_custom_int     iimd_send_custom_int
+#define  IIMD_get_custom_float    iimd_get_custom_float
+#define  IIMD_get_custom_int      iimd_get_custom_int
 #define  IIMD_get_coords          iimd_get_coords
 #define  IIMD_get_energies        iimd_get_energies
 #define  IIMD_get_grid            iimd_get_grid
@@ -155,6 +163,23 @@ Send forces apply on the atoms of the molecular system
 extern void  IIMD_send_forces       ( const int *N_p, int* AtomIndex, float *forces );
 
 /**
+Send custom float data with 8 characters as string id
+@param dataname dataname string id
+@param size size of float array
+@param data data float array
+*/
+extern void  IIMD_send_custom_float ( const char * dataname, int *n_floats , float * data );
+
+/**
+Send custom int data with 8 characters as string id
+@param dataname dataname string id
+@param size size of int array
+@param data data int array
+*/
+extern void  IIMD_send_custom_int ( const char * dataname, int *n_ints, int * data );
+
+
+/**
 Disconnect the MDDriver connection
 */
 extern void  IIMD_send_disconnect   ( );
@@ -206,6 +231,25 @@ Get forces apply on the atoms of the molecular system
 @return if forces is avalaible return 1 else return 0
 */
 extern int   IIMD_get_forces        ( imd_int32 *n_atoms, imd_int32 **atom_list, float     **force_list);
+
+/**
+Get custom float data
+@param dataname string id of the data array
+@param n_floats number of floats
+@param data data array
+@return if data is avalaible return 1 else return 0
+*/
+extern int   IIMD_get_custom_float(char ** dataname,  int *n_floats, float     **data);
+
+/**
+Get custom int data
+@param dataname string id of the data array
+@param n_ints number of ints
+@param data data array
+@return if data is avalaible return 1 else return 0
+*/
+extern int   IIMD_get_custom_int(char ** dataname,  int *n_ints, int     **data);
+
 
 /**
 Terminate properly a MDDriver connection

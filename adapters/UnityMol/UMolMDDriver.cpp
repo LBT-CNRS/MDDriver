@@ -51,23 +51,38 @@ public:
     int N_atoms;
     t_coord *coords;
     FILE *MYIMDlog;
-
     int nb_forces ;
     float *forces_list ;
     int *forces_atoms_list ;
+
+    int N_floats;
+    float *customfloat;
+    char * datanamefloat;
+
+    int N_ints;
+    int *customint;
+    char * datanameint;
 
     MDDriverAdapter();
 };
 
 MDDriverAdapter::MDDriverAdapter()
 {
-  int N_atoms = 0;
-  t_coord *coords;
-  FILE *MYIMDlog;
+  N_atoms = 0;
+  coords=NULL;
+  MYIMDlog = NULL;
 
-  int nb_forces = 0;
-  float *forces_list = NULL;
-  int *forces_atoms_list = NULL;
+  nb_forces = 0;
+  forces_list = NULL;
+  forces_atoms_list = NULL;
+
+  N_floats = 0;
+  customfloat = NULL;
+  datanamefloat=(char *) malloc(sizeof(char)*8);
+  N_ints = 0;
+  customint= NULL;
+  datanameint=(char *) malloc(sizeof(char)*8);
+
 }
 
 void MDDriver_freeForces(MDDriverAdapter *mddinstance);
@@ -84,11 +99,16 @@ API int MDDriver_start(MDDriverAdapter *mddinstance);
 API int MDDriver_stop(MDDriverAdapter *mddinstance);
 API bool MDDriver_isConnected(MDDriverAdapter *mddinstance);
 API int MDDriver_getNbParticles(MDDriverAdapter *mddinstance);
+API int MDDriver_getNbCustomFloat(MDDriverAdapter *mddinstance);
+API int MDDriver_getNbCustomInt(MDDriverAdapter *mddinstance);
 API int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *verts, int nbParticles);
+API int MDDriver_getCustomFloat(MDDriverAdapter *mddinstance, char * datanamefloat, float *customfloat, int nbfloat);
+API int MDDriver_getCustomInt(MDDriverAdapter *mddinstance, char * datanameint, int * customint, int nbint);
 API void MDDriver_pause(MDDriverAdapter *mddinstance);
 API void MDDriver_play(MDDriverAdapter *mddinstance);
 API void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float *forceslist);
 API void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies);
+API void MDDriver_getGrid(MDDriverAdapter *mddinstance, IMDGrid *grid);
 API int MDDriver_loop(MDDriverAdapter *mddinstance);
 API void MDDriver_disconnect(MDDriverAdapter *mddinstance);
 
@@ -187,6 +207,21 @@ int MDDriver_getNbParticles(MDDriverAdapter *mddinstance) {
     return mddinstance->N_atoms;
 }
 
+int MDDriver_getNbCustomFloat(MDDriverAdapter *mddinstance) {
+    if (mddinstance->N_floats <= 0) {
+        IIMD_get_custom_float( &(mddinstance->datanamefloat), &(mddinstance->N_floats), (float **) & (mddinstance->customfloat) );
+    }
+    return mddinstance->N_floats;
+}
+
+int MDDriver_getNbCustomInt(MDDriverAdapter *mddinstance) {
+    if (mddinstance->N_ints <= 0) {
+        IIMD_get_custom_int( &(mddinstance->datanameint), &(mddinstance->N_ints), (int **) & (mddinstance->customint) );
+    }
+    return mddinstance->N_ints;
+}
+
+
 void MDDriver_pause(MDDriverAdapter *mddinstance) {
     IIMD_send_pause();
 }
@@ -200,6 +235,21 @@ int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *coordinates, int 
     memcpy(coordinates, mddinstance->coords, nbPos * sizeof(float) * 3);
     return nbPos;
 }
+
+
+int MDDriver_getCustomFloat(MDDriverAdapter *mddinstance, char * datanamefloat, float *customfloat, int nbfloat) {
+    IIMD_get_custom_float(&(mddinstance->datanamefloat),  &(mddinstance->N_floats), (float **) & (mddinstance->customfloat) );
+    memcpy(customfloat, mddinstance->customfloat, nbfloat * sizeof(float));
+    return nbfloat;
+}
+
+int MDDriver_getCustomInt(MDDriverAdapter *mddinstance, char * datanameint, int * customint, int nbint) {
+  IIMD_get_custom_float(&(mddinstance->datanameint) , &(mddinstance->N_ints), (float **) & (mddinstance->customint) );
+  memcpy(customint, mddinstance->customint, nbint * sizeof(int));
+  return nbint;
+}
+
+
 
 void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float * forceslist) {
     if (mddinstance->nb_forces != nbforces || mddinstance->forces_list == NULL) {
@@ -231,6 +281,41 @@ void MDDriver_getEnergies(MDDriverAdapter *mddinstance, IMDEnergies *energies) {
     energies->Eangle = curE->Eangle;
     energies->Edihe = curE->Edihe;
     energies->Eimpr = curE->Eimpr;
+}
+
+void MDDriver_getGrid(MDDriverAdapter *mddinstance, IMDGrid *grid) {
+    IMDGrid *curG;
+    IIMD_get_grid( &curG);
+
+    grid->tstep = curG->tstep;
+    grid->Xorigin = curG->Xorigin;
+    grid->Yorigin = curG->Yorigin;
+    grid->Zorigin = curG->Zorigin;
+
+    grid->Xend = curG->Xend;
+    grid->Yend = curG->Yend;
+    grid->Zend = curG->Zend;
+
+    grid->XdirectionX = curG->XdirectionX;
+    grid->YdirectionX = curG->YdirectionX;
+    grid->ZdirectionX = curG->ZdirectionX;
+
+    grid->XdirectionY = curG->XdirectionY;
+    grid->YdirectionY = curG->YdirectionY;
+    grid->ZdirectionY = curG->ZdirectionY;
+
+    grid->XdirectionZ = curG->XdirectionZ;
+    grid->YdirectionZ = curG->YdirectionZ;
+    grid->ZdirectionZ = curG->ZdirectionZ;
+
+    grid->nbcellx = curG->nbcellx;
+    grid->nbcelly = curG->nbcelly;
+    grid->nbcellz = curG->nbcellz;
+
+    grid->sizecellx = curG->sizecellx;
+    grid->sizecelly = curG->sizecelly;
+    grid->sizecellz = curG->sizecellz;
+
 }
 
 int MDDriver_loop(MDDriverAdapter *mddinstance) {

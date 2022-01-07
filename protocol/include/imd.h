@@ -46,6 +46,10 @@ typedef short   imd_int32;
 #endif
 typedef long long  imd_int64;
 
+#define DATANAME_SIZE 8
+#define HEADERSIZE 8
+#define IMDVERSION 2
+
 
 typedef enum IMDType_t
 {
@@ -58,8 +62,10 @@ typedef enum IMDType_t
 	IMD_MDCOMM,       //!< MDComm style force data
 	IMD_PAUSE,        //!< pause the running simulation
 	IMD_TRATE,        //!< set IMD update transmission rate
-	IMD_IOERROR,       //!< indicate an I/O error
-	IMD_GRID       		//!< grid data block
+	IMD_IOERROR,      //!< indicate an I/O error
+	IMD_GRID,       	//!< grid data block
+	IMD_CUSTOM_FLOAT, //!< float data block
+	IMD_CUSTOM_INT  //!< int data block
 } IMDType;
 
 
@@ -88,9 +94,13 @@ typedef struct
 {
 	imd_int32 tstep;  //!< integer timestep index
 
-	float Xorigin;   //!< Grid origin X
-	float Yorigin;   //!< Grid origin Y
-	float Zorigin;   //!< Grid origin Z
+	float Xorigin;   //!< Grid origin X (diagonal origin)
+	float Yorigin;   //!< Grid origin Y (diagonal origin)
+	float Zorigin;   //!< Grid origin Z (diagonal origin)
+
+	float Xend;   //!< Grid end X (diagonal origin)
+	float Yend;   //!< Grid end Y (diagonal origin)
+	float Zend;   //!< Grid end Z (diagonal origin)
 
 	float XdirectionX;   //!< X component X vector direction of the grid frame (right hand frame)
 	float YdirectionX;   //!< Y component X vector direction of the grid frame (right hand frame)
@@ -103,6 +113,8 @@ typedef struct
 	float XdirectionZ;   //!< X component Z vector direction of the grid frame (right hand frame)
 	float YdirectionZ;   //!< Y component Z vector direction of the grid frame (right hand frame)
 	float ZdirectionZ;   //!< Z component Z vector direction of the grid frame (right hand frame)
+
+
 
 	imd_int32 nbcellx;         //!< Number of cells along X axis
 	imd_int32 nbcelly;         //!< Number of cells along Y axis
@@ -133,6 +145,17 @@ extern int imd_trate(void *, imd_int32); //!< set IMD update transmission rate
  */
 extern int imd_send_mdcomm(void *, imd_int32, const imd_int32 *, const float *);
 
+/*!
+ *  Send custom float array
+ */
+extern int imd_send_custom_float(void *, const char*, imd_int32, const float *);
+
+/*!
+ *  Send custom float array
+ */
+extern int imd_send_custom_int(void *, const char*, imd_int32, const imd_int32 *);
+
+
 //! Send energies
 extern int imd_send_energies(void *, const IMDEnergies *);
 
@@ -145,6 +168,10 @@ extern int imd_send_grid(void *, const IMDGrid *);
  *  Forces are in Kcal/mol/angstrom
  */
 extern int imd_send_fcoords(void *, imd_int32, const float *);
+
+
+
+
 
 /*!
  *  recv_handshake returns 0 if server and client have the same relative
@@ -163,6 +190,18 @@ extern IMDType imd_recv_header(void *, imd_int32 *);
  *  Forces are in Kcal/mol/angstrom
  */
 extern int imd_recv_mdcomm(void *, imd_int32, imd_int32 *, float *);
+
+/*!
+ *  Receive custom float array
+ */
+extern int imd_recv_custom_float(void * ,  char *, imd_int32, float *);
+
+/*!
+ *  Receive custom int array
+ */
+extern int imd_recv_custom_int(void * ,  char *, imd_int32, imd_int32 *);
+
+
 
 /*!
  *  Receive energies

@@ -126,15 +126,26 @@ static int timeout = 3600;
 static imd_int32    vmd_length = 0;
 static imd_int32    vmd_Nforces = 0;
 static imd_int32    vmd_Ncoords = 0;
+static imd_int32    vmd_Nfloat = 0;
+static imd_int32    vmd_Nint = 0;
+
 static imd_int32   *vmd_atoms  = 0;
 static float       *vmd_forces = 0;
 static float       *vmd_coords = 0;
+
+static float       *vmd_custom_float = 0;
+static imd_int32   *vmd_custom_int = 0;
+
 static IMDEnergies  vmd_energies;
 static IMDGrid      vmd_grid;
 static imd_int32    vmd_new_coords = 0;
 static imd_int32    vmd_new_energies = 0;
 static imd_int32    vmd_new_grid = 0;
+static imd_int32    vmd_new_custom_float = 0;
+static imd_int32    vmd_new_custom_int = 0;
 
+static char customdatanamefloat[DATANAME_SIZE]="";
+static char customdatanameint[DATANAME_SIZE]="";
 //-------------------------------------------------------
 //
 //  Socket list utilities
@@ -523,15 +534,101 @@ void IIMD_treatprotocol()
 				{
 					IMDGrid dummy;
 					imd_recv_grid(clientsock, &dummy);
-
 					break;
 				}
 				case IMD_FCOORDS:
-					//
+				{	//
+
 					vmd_coords = (float* )malloc( sizeof(float) * 3 * vmd_length );
 					imd_recv_fcoords(clientsock, vmd_length, vmd_coords);
 					free(vmd_coords);
 					break;
+				}
+				case IMD_CUSTOM_FLOAT:
+
+					// List of custom float are expected
+
+					if (IMDmsg >= 1)
+						fprintf(IMDlog, "MDDriver >      Received %d custom float \n", vmd_length);
+
+					if ( vmd_length != 0 )
+					{
+
+						if ( vmd_custom_float != 0 )
+						{
+							free( vmd_custom_float );
+							vmd_custom_float = 0;
+						}
+						vmd_Nfloat=vmd_length;
+						vmd_custom_float  = (float *) malloc( sizeof(float) * vmd_Nfloat     );
+
+						if (imd_recv_custom_float(clientsock, customdatanamefloat, vmd_Nfloat, vmd_custom_float))
+						{
+							fprintf(IMDlog, "MDDriver >      Error reading custom float, killing connection\n");
+							SL_DelSocket(i_client);
+						}
+					}
+
+					if (IMDmsg > 0)
+					{
+						fprintf(IMDlog, "MDDriver >      \n");
+						fprintf(IMDlog, "MDDriver >        IMD custom float received from client %s\n", customdatanamefloat);
+						fprintf(IMDlog, "MDDriver >        ------------------------------- \n");
+						fprintf(IMDlog, "MDDriver >      \n");
+
+						fprintf(IMDlog, "MDDriver >      Number of custom float to apply %d\n",
+										vmd_Nfloat);
+						for (i = 0; i < vmd_Nfloat; i++)
+						{
+							fprintf(IMDlog, "MDDriver >      Custom float %d : %f \n", i, vmd_custom_float[i]);
+						}
+						fprintf(IMDlog, "MDDriver >      \n");
+
+					}
+					break;
+
+				case IMD_CUSTOM_INT:
+				// List of custom float are expected
+
+					if (IMDmsg >= 1)
+						fprintf(IMDlog, "MDDriver >      Received %d custom int \n", vmd_length);
+
+					if ( vmd_length != 0 )
+					{
+
+						if ( vmd_custom_int != 0 )
+						{
+							free( vmd_custom_int );
+							vmd_custom_int = 0;
+						}
+						vmd_Nint=vmd_length;
+						vmd_custom_int  = (int *) malloc( sizeof(int) * vmd_Nint     );
+
+						if (imd_recv_custom_int(clientsock, customdatanameint, vmd_Nint, vmd_custom_int))
+						{
+							fprintf(IMDlog, "MDDriver >      Error reading custom int, killing connection\n");
+							SL_DelSocket(i_client);
+						}
+					}
+
+					if (IMDmsg > 0)
+					{
+						fprintf(IMDlog, "MDDriver >      \n");
+						fprintf(IMDlog, "MDDriver >        IMD custom int received from client %s\n", customdatanameint);
+						fprintf(IMDlog, "MDDriver >        ------------------------------- \n");
+						fprintf(IMDlog, "MDDriver >      \n");
+
+						fprintf(IMDlog, "MDDriver >      Number of custom int to apply %d\n",
+										vmd_Nint);
+						for (i = 0; i < vmd_Nint; i++)
+						{
+							fprintf(IMDlog, "MDDriver >      Custom int %d : %d \n",i, vmd_custom_int[i]);
+						}
+						fprintf(IMDlog, "MDDriver >      \n");
+
+					}
+					break;
+
 				default: ;
 				}
 			}
@@ -597,7 +694,48 @@ void IIMD_treatprotocol()
 						vmd_new_grid = 1;
 					}
 					break;
-
+			case IMD_CUSTOM_FLOAT:
+				if (vmd_Nfloat != 0)
+					free( vmd_custom_float );
+				vmd_Nfloat=vmd_length;
+				vmd_custom_float = (float*) malloc( vmd_Nfloat * sizeof(float));
+				if (imd_recv_custom_float(sock, customdatanamefloat, vmd_Nfloat, vmd_custom_float))
+					{
+					fprintf(IMDlog, "MDDriver >      \n");
+					fprintf(IMDlog, "MDDriver >      Cannot read custom float - disconnecting \n");
+					disconnect( sock );
+					}
+				else
+					{
+					if (IMDmsg >= 1 )
+						{
+						fprintf(IMDlog, "MDDriver >      Received %d custom float %s\n", vmd_Nfloat, customdatanamefloat);
+						}
+					if ( IMDswap ) imd_swap4( (char *) vmd_custom_float, vmd_Nfloat);
+					vmd_new_custom_float = 1;
+					}
+				break;
+			case IMD_CUSTOM_INT:
+				if (vmd_Nint != 0)
+					free( vmd_custom_int );
+				vmd_Nint=vmd_length;
+				vmd_custom_int = (int*) malloc( vmd_Nfloat * sizeof(int));
+				if (imd_recv_custom_int(sock, customdatanameint, vmd_Nint, vmd_custom_int))
+					{
+					fprintf(IMDlog, "MDDriver >      \n");
+					fprintf(IMDlog, "MDDriver >      Cannot read custom int - disconnecting \n");
+					disconnect( sock );
+					}
+				else
+					{
+					if (IMDmsg >= 1 )
+						{
+						fprintf(IMDlog, "MDDriver >      Received %d custom int %s\n", vmd_Nint, customdatanameint);
+						}
+					if ( IMDswap ) imd_swap4( (char *) vmd_custom_int, vmd_Nint);
+					vmd_new_custom_int = 1;
+					}
+				break;
 
 			case IMD_DISCONNECT:
 				fprintf(IMDlog, "MDDriver >      \n");
@@ -898,6 +1036,7 @@ void IIMD_send_grid(const IMDGrid *grid)
 		fprintf(IMDlog, "MDDriver >   Simulation grid info \n" );
 		fprintf(IMDlog, "MDDriver >   --------------------\n");
 		fprintf(IMDlog, "MDDriver >   Origin %f, %f, %f\n", vmd_grid.Xorigin, vmd_grid.Yorigin, vmd_grid.Zorigin);
+		fprintf(IMDlog, "MDDriver >   End %f, %f, %f\n", vmd_grid.Xend, vmd_grid.Yend, vmd_grid.Zend);
 		fprintf(IMDlog, "MDDriver >   Direction X %f, %f, %f\n", vmd_grid.XdirectionX, vmd_grid.XdirectionX, vmd_grid.XdirectionX);
 		fprintf(IMDlog, "MDDriver >   Direction Y %f, %f, %f\n", vmd_grid.XdirectionY, vmd_grid.XdirectionY, vmd_grid.XdirectionY);
 		fprintf(IMDlog, "MDDriver >   Direction Z %f, %f, %f\n", vmd_grid.XdirectionZ, vmd_grid.YdirectionZ, vmd_grid.ZdirectionZ);
@@ -1024,6 +1163,73 @@ void IIMD_send_forces(const int *N_p, int* AtomIndex, float *forces)
 	if (IMDmsg >= 1)
 		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
 }
+
+void IIMD_send_custom_float ( const char * dataname, int *n_floats , float * data )
+{
+	int N = *n_floats;
+	int i;
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+	for (i = 0; i < SL_NSockets; i++)
+	{
+		void *clientsock =  SL_SocketList[i];
+		if (!clientsock || !vmdsock_selwrite(clientsock, 0))
+			continue;
+		imd_send_custom_float(clientsock, dataname, N, data);
+	}
+
+	if (IMDmsg >= 2)
+	{
+		fprintf(IMDlog, "MDDriver >      \n");
+		fprintf(IMDlog, "MDDriver >      Sent custom float (step %d) \n", vmd_energies.tstep);
+		fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
+		fprintf(IMDlog, "MDDriver >      Number of float  %d\n", N);
+		for (i = 0; i < N; i++)
+		{
+			fprintf(IMDlog, "MDDriver >      Float  array [%d] : %f \n", i, data[i]);
+		}
+	}
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+
+}
+
+void  IIMD_send_custom_int ( const char * dataname, int *n_ints, int * data )
+{
+	int N = *n_ints;
+	int i;
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+	for (i = 0; i < SL_NSockets; i++)
+	{
+		void *clientsock =  SL_SocketList[i];
+		if (!clientsock || !vmdsock_selwrite(clientsock, 0))
+			continue;
+		imd_send_custom_int(clientsock, dataname, N, data);
+	}
+
+	if (IMDmsg >= 2)
+	{
+		fprintf(IMDlog, "MDDriver >      \n");
+		fprintf(IMDlog, "MDDriver >      Sent custom int (step %d) \n", vmd_energies.tstep);
+		fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
+		fprintf(IMDlog, "MDDriver >      Number of int  %d\n", N);
+		for (i = 0; i < N; i++)
+		{
+			fprintf(IMDlog, "MDDriver >      Int  array [%d] : %d \n", i, data[i]);
+		}
+	}
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+
+}
+
 
 void IIMD_send_disconnect()
 {
@@ -1158,6 +1364,75 @@ int IIMD_get_coords( imd_int32 *n_atoms, float **coords)
 	return rc;
 }
 
+int   IIMD_get_custom_float	 (char ** dataname,  int *n_floats, float     **data)
+{
+	int rc = 0;
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+	if ( vmd_new_custom_float )
+	{
+		strncpy(*dataname, customdatanamefloat, DATANAME_SIZE);
+		(*dataname)[7]='\0';
+		*n_floats = vmd_Nfloat;
+		*data  = vmd_custom_float;
+		rc = vmd_Nfloat;
+
+		if (IMDmsg >= 2)
+		{
+			fprintf(IMDlog, "MDDriver >      \n");
+			fprintf(IMDlog, "MDDriver >      Get float array (step %d) \n", vmd_energies.tstep);
+			fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
+			unsigned i = 0;
+			fprintf(IMDlog, "MDDriver >      Get float array  %d %s \n", *n_floats, (*dataname));
+			for (i = 0; i < vmd_Nfloat; i++)
+			{
+				fprintf(IMDlog, "MDDriver >      Get float array[%d] = %f \n", i,  (*data)[i]);
+			}
+		}
+	}
+
+	vmd_new_custom_float = 0;
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+	return rc;
+}
+
+int   IIMD_get_custom_int	 (char ** dataname,  int *n_ints, int     **data)
+{
+	int rc = 0;
+
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+	if ( vmd_new_custom_int )
+	{
+		strncpy(*dataname, customdatanameint, DATANAME_SIZE);
+		(*dataname)[7]='\0';
+		*n_ints = vmd_Nint;
+		*data  = vmd_custom_int;
+		rc = vmd_Nint;
+
+		if (IMDmsg >= 2)
+		{
+			fprintf(IMDlog, "MDDriver >      \n");
+			fprintf(IMDlog, "MDDriver >      Get int array (step %d) \n", vmd_energies.tstep);
+			fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
+			unsigned i = 0;
+			fprintf(IMDlog, "MDDriver >      Get int array  %d %s\n", *n_ints, (*dataname));
+			for (i = 0; i < vmd_Nint; i++)
+			{
+				fprintf(IMDlog, "MDDriver >      Get int array[%d] = %d \n", i,  (*data)[i]);
+			}
+		}
+	}
+
+	vmd_new_custom_int = 0;
+	if (IMDmsg >= 1)
+		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+	return rc;
+}
+
+
 int IIMD_get_energies( IMDEnergies **energ_ )
 {
 	int rc = 0;
@@ -1256,6 +1531,8 @@ void IIMD_terminate()
 	vmd_new_coords = 0;
 	vmd_new_energies = 0;
 	vmd_new_grid = 0;
+	vmd_new_custom_int=0;
+	vmd_new_custom_float=0;
 	if (sock) {
 		vmdsock_shutdown(sock);
 		vmdsock_destroy(sock);
