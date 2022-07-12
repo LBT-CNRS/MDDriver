@@ -70,7 +70,9 @@ extern imd_int64 imd_value;
 #define  IIMD_send_custom_float   iimd_send_custom_float_
 #define  IIMD_send_custom_int     iimd_send_custom_int_
 #define  IIMD_get_custom_float    iimd_get_custom_float_
+#define  IIMD_get_nb_custom_float iimd_get_nb_custom_float_
 #define  IIMD_get_custom_int      iimd_get_custom_int_
+#define  IIMD_get_nb_custom_int   iimd_get_nb_custom_int_
 #define  IIMD_get_coords          iimd_get_coords_
 #define  IIMD_get_energies        iimd_get_energies_
 #define  IIMD_get_grid            iimd_get_grid_
@@ -89,7 +91,9 @@ extern imd_int64 imd_value;
 #define  IIMD_send_custom_float   iimd_send_custom_float
 #define  IIMD_send_custom_int     iimd_send_custom_int
 #define  IIMD_get_custom_float    iimd_get_custom_float
+#define  IIMD_get_nb_custom_float iimd_get_nb_custom_float
 #define  IIMD_get_custom_int      iimd_get_custom_int
+#define  IIMD_get_nb_custom_int   iimd_get_nb_custom_int
 #define  IIMD_get_coords          iimd_get_coords
 #define  IIMD_get_energies        iimd_get_energies
 #define  IIMD_get_grid            iimd_get_grid
@@ -242,6 +246,13 @@ Get custom float data
 extern int   IIMD_get_custom_float(char ** dataname,  int *n_floats, float     **data);
 
 /**
+Get custom number of float data
+@param n_floats number of floats
+@return return number of floats
+*/
+extern int   IIMD_get_nb_custom_float(int *n_floats);
+
+/**
 Get custom int data
 @param dataname string id of the data array
 @param n_ints number of ints
@@ -249,6 +260,13 @@ Get custom int data
 @return if data is avalaible return 1 else return 0
 */
 extern int   IIMD_get_custom_int(char ** dataname,  int *n_ints, int     **data);
+
+/**
+Get custom number of int data
+@param n_ints number of ints
+@return return number of ints
+*/
+extern int   IIMD_get_nb_custom_int(int *n_ints);
 
 
 /**

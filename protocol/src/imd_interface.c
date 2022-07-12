@@ -440,7 +440,8 @@ void IIMD_treatprotocol()
 
 					if ( (vmd_length == 0) || ( n_forces == 0) )
 					{
-						fprintf(IMDlog, "MDDriver >      Warning no force \n");
+						if (IMDmsg > 0)
+							fprintf(IMDlog, "MDDriver >      Warning no force \n");
 						free( vmd_atoms );
 						free( vmd_forces );
 						vmd_atoms = 0;  vmd_forces = 0;
@@ -567,6 +568,11 @@ void IIMD_treatprotocol()
 							fprintf(IMDlog, "MDDriver >      Error reading custom float, killing connection\n");
 							SL_DelSocket(i_client);
 						}
+						else
+						{
+							if ( IMDswap ) imd_swap4( (char *) vmd_custom_float, vmd_Nfloat);
+								vmd_new_custom_float = 1;
+						}
 					}
 
 					if (IMDmsg > 0)
@@ -608,6 +614,11 @@ void IIMD_treatprotocol()
 						{
 							fprintf(IMDlog, "MDDriver >      Error reading custom int, killing connection\n");
 							SL_DelSocket(i_client);
+						}
+						else
+						{
+							if ( IMDswap ) imd_swap4( (char *) vmd_custom_int, vmd_Nint);
+								vmd_new_custom_int = 1;
 						}
 					}
 
@@ -719,7 +730,7 @@ void IIMD_treatprotocol()
 				if (vmd_Nint != 0)
 					free( vmd_custom_int );
 				vmd_Nint=vmd_length;
-				vmd_custom_int = (int*) malloc( vmd_Nfloat * sizeof(int));
+				vmd_custom_int = (int*) malloc( vmd_Nint * sizeof(int));
 				if (imd_recv_custom_int(sock, customdatanameint, vmd_Nint, vmd_custom_int))
 					{
 					fprintf(IMDlog, "MDDriver >      \n");
@@ -847,6 +858,8 @@ FILE *IIMD_init( const char  *hostname,     imd_int32   *mode,  imd_int32   *IMD
 			}
 			fprintf(IMDlog, "MDDriver >      Interactive MD bind to /%s/%d \n", str, IMDport );
 		}
+
+		*IMDport_ = IMDport;
 
 		fflush( IMDlog );
 
@@ -1180,6 +1193,15 @@ void IIMD_send_custom_float ( const char * dataname, int *n_floats , float * dat
 		imd_send_custom_float(clientsock, dataname, N, data);
 	}
 
+	// From client side to server
+	if(sock && !IMDserver)
+    {
+		if ( IMDswap ) imd_swap4( data, N);
+        if (imd_send_custom_float(sock, dataname, N, data)) {
+            fprintf( IMDlog, "MDDriver > ---- Failed to send custom float in %s\n", __FUNCTION__);
+       }
+    }
+
 	if (IMDmsg >= 2)
 	{
 		fprintf(IMDlog, "MDDriver >      \n");
@@ -1212,6 +1234,15 @@ void  IIMD_send_custom_int ( const char * dataname, int *n_ints, int * data )
 			continue;
 		imd_send_custom_int(clientsock, dataname, N, data);
 	}
+
+	// From client side to server
+	if(sock && !IMDserver)
+    {
+		if ( IMDswap ) imd_swap4( data, N);
+        if (imd_send_custom_int(sock, dataname, N, data)) {
+            fprintf( IMDlog, "MDDriver > ---- Failed to send custom int in %s\n", __FUNCTION__);
+       }
+    }
 
 	if (IMDmsg >= 2)
 	{
@@ -1398,6 +1429,30 @@ int   IIMD_get_custom_float	 (char ** dataname,  int *n_floats, float     **data
 	return rc;
 }
 
+int   IIMD_get_nb_custom_float	 (int *n_floats) {
+    int rc = 0;
+
+    if (IMDmsg >= 1)
+        fprintf(IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+    if (vmd_new_custom_float) {
+        *n_floats = vmd_Nfloat;
+        rc = vmd_Nfloat;
+
+        if (IMDmsg >= 2) {
+            fprintf(IMDlog, "MDDriver >      \n");
+            fprintf(IMDlog, "MDDriver >      Get number of float (step %d) \n", vmd_energies.tstep);
+            fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
+            fprintf(IMDlog, "MDDriver >      Number of floats: %d\n", *n_floats);
+        }
+    }
+
+    if (IMDmsg >= 1)
+        fprintf(IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+
+    return rc;
+}
+
 int   IIMD_get_custom_int	 (char ** dataname,  int *n_ints, int     **data)
 {
 	int rc = 0;
@@ -1430,6 +1485,30 @@ int   IIMD_get_custom_int	 (char ** dataname,  int *n_ints, int     **data)
 	if (IMDmsg >= 1)
 		fprintf( IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
 	return rc;
+}
+
+int   IIMD_get_nb_custom_int	 (int *n_ints) {
+    int rc = 0;
+
+    if (IMDmsg >= 1)
+        fprintf(IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
+
+    if (vmd_new_custom_int) {
+        *n_ints = vmd_Nint;
+        rc = vmd_Nint;
+
+        if (IMDmsg >= 2) {
+            fprintf(IMDlog, "MDDriver >      \n");
+            fprintf(IMDlog, "MDDriver >      Get number of int (step %d) \n", vmd_energies.tstep);
+            fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
+            fprintf(IMDlog, "MDDriver >      Number of ints: %d\n", *n_ints);
+        }
+    }
+
+    if (IMDmsg >= 1)
+        fprintf(IMDlog, "MDDriver > ---- Leaving     %s\n", __FUNCTION__);
+
+    return rc;
 }
 
 
