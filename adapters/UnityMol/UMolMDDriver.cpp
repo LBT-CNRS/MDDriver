@@ -256,8 +256,8 @@ int MDDriver_getCustomInt(MDDriverAdapter *mddinstance, char * datanameint, int 
 void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float * forceslist) {
     if (mddinstance->nb_forces != nbforces || mddinstance->forces_list == NULL) {
         if (mddinstance->forces_list != NULL) {
-            free(mddinstance->forces_list);
-            free(mddinstance->forces_atoms_list);
+            delete mddinstance->forces_list;
+            delete mddinstance->forces_atoms_list;
         }
         mddinstance->forces_list = new float[3 * nbforces];//(float *)malloc(sizeof(float) * 3 * nbforces);
         mddinstance->forces_atoms_list = new int[nbforces];//(int *)malloc(sizeof(int) * nbforces);
