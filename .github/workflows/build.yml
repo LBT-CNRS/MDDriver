@@ -1,0 +1,23 @@
+name: Build MDDriver library and Plugins folder
+
+on:
+  push:
+  pull_request:
+  release:
+
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure
+        run: cmake -S . -B build
+      - name: Build
+        run: cmake --build build
