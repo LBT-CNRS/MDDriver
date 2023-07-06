@@ -19,10 +19,6 @@
 #endif
 
 
-#if defined(__unix__) || defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-#define OS_UNIX
-#endif
-
 #if defined(__APPLE__) || defined(__MACH__)
 #define OS_OSX
 #endif

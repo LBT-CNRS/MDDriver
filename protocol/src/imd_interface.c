@@ -228,7 +228,7 @@ static void SL_DelAllSocket( )
 //
 //-------------------------------------------------------
 
-#ifdef __MACOSX__
+#ifdef __APPLE__
 
 //gethostbyname_r n'existe pas sous macosx
 static int find_free_port(void *sock, const char* hostname, int defport)
