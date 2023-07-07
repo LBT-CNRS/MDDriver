@@ -7,6 +7,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 option(BUILD_PLUGINS "Build Plugins" ON)
 option(INSTALL_EXAMPLE_TOOL "Install the example tool which use the MDDriver library" OFF)
+option(INSTALL_PYTHON_LIB "Install the python lib which use the MDDriver library" OFF)
 
 
 
@@ -45,6 +46,16 @@ endif()
 
 if(INSTALL_EXAMPLE_TOOL)
     install(DIRECTORY example_tool
+            DESTINATION ${MDDRIVER_INSTALL_SHARE_DIR}
+            )
+endif()
+
+###################
+### PYTHON LIB ####
+###################
+
+if(INSTALL_PYTHON_LIB)
+    install(DIRECTORY protocol/python
             DESTINATION ${MDDRIVER_INSTALL_SHARE_DIR}
             )
 endif()
