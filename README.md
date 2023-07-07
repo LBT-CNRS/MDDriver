@@ -33,6 +33,9 @@ These 3 components (UnityMol, MDDriver and Biospring) have been used together re
 git clone https://github.com/LBT-CNRS/MDDriver
 cd MDDriver/
 
+# On Windows with Microsoft Visual Studio 16 for example
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX:PATH=/path/to/mddriver/installation -G "Visual Studio 16 2019"
+
 # On Mac/Linux
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX:PATH=/path/to/mddriver/installation
 cmake --build build

@@ -1,7 +1,10 @@
-#include "MDDriver.h" 
+#include "MDDriver.h"
 
 #include <stdlib.h>
+#include <cstring>
 #include <iostream>
+#include <unistd.h>
+
 
 
 #define PDBNAMEMAXSIZE 256
@@ -36,7 +39,7 @@ int main( int argc, char *argv[] )
 			i++;
 			if(i<argc)
 				strcpy(hostname,argv[i]);
-			else 	
+			else
 				usage();
 			}
 		else if(strcmp("-port",argv[i])==0)
@@ -44,13 +47,13 @@ int main( int argc, char *argv[] )
 			i++;
 			if(i<argc)
 				port=atoi(argv[i]);
-			else 	
+			else
 				usage();
 			}
 
 
 		}
-	
+
 	cout<<"MDDriver loop started"<<endl;
 	MDDriver * imdl=new MDDriver(hostname,port);
 	imdl->start();
@@ -59,7 +62,7 @@ int main( int argc, char *argv[] )
 		{
 		usleep(500000);
 		}
-		
+
 
 	return 0;
 	}

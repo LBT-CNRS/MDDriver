@@ -1,111 +1,89 @@
-# Copyright Centre National de la Recherche Scientifique (CNRS)
-# contributors :
-# Marc Baaden, 2007-8
-# Olivier Delalande, 2008
-# Nicolas Ferey, 2008
-# Gilles Grasseau, 2007-8
-#
-# baaden@smplinux.de
-# http://www.baaden.ibpc.fr
-#
-# This software is a computer program whose purpose is to provide a general
-# interface for coupling calculation and visualization modules via the IMD
-# protocol. The part of this source code dealing directly with the IMD
-# protocol was adapted from the VMD/NAMD packages.
-#
-# This source code is part of MDDriver, a general purpose library for
-# interactive simulations. This software is governed by the CeCILL-C license
-# under French law and abiding by the rules of distribution of free software.
-# You can use, modify and/or redistribute the software under the terms of the
-# CeCILL-C license as circulated by CEA, CNRS and INRIA at the following URL
-# http://www.cecill.info.
-#
-# As a counterpart to the access to the source code and rights to copy,
-# modify and redistribute granted by the license, users are provided only
-# with a limited warranty and the software's author, the holder of the
-# economic rights, and the successive licensors have only limited
-# liability.
-#
-# In this respect, the user's attention is drawn to the risks associated
-# with loading, using, modifying and/or developing or reproducing the
-# software by the user in light of its specific status of free software,
-# that may mean that it is complicated to manipulate, and that also
-# therefore means that it is reserved for developers and experienced
-# professionals having in-depth computer knowledge. Users are therefore
-# encouraged to load and test the software's suitability as regards their
-# requirements in conditions enabling the security of their systems and/or
-# data to be ensured and, more generally, to use and operate it in the
-# same conditions as regards security.
-#
-# The fact that you are presently reading this means that you have had
-# knowledge of the CeCILL-C license and that you accept its terms.
+cmake_minimum_required(VERSION 3.15)
 
-PROJECT (MDDriver)
+project(MDDriver VERSION 1.0)
 
-ADD_DEFINITIONS(-fPIC)
-
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
-IF(COMMAND CMAKE_POLICY)
-      CMAKE_POLICY(SET CMP0003 NEW)
-ENDIF(COMMAND CMAKE_POLICY)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	SET(CMAKE_C_FLAGS "-D__MACOSX__")
-	SET(CMAKE_C_FLAGS "-arch x86_64  -D__MACOSX__")
-	#SET(CMAKE_C_FLAGS "-arch i386 -arch ppc -arch x86_64 -mmacosx-version-min=10.6  -D__MACOSX__")
-	#SET(CMAKE_OSX_SYSROOT /Developer/SDKs/MacOSX10.6.sdk)
-  set(CMAKE_MACOSX_RPATH 1)
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+option(BUILD_PLUGINS "Build Plugins" ON)
+option(INSTALL_EXAMPLE_TOOL "Install the example tool which use the MDDriver library" OFF)
+option(INSTALL_PYTHON_LIB "Install the python lib which use the MDDriver library" OFF)
 
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	SET(CMAKE_C_FLAGS "-D__LINUX__")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-IF(WIN32)
-    link_libraries(ws2_32 wsock32)
-ENDIF()
+#### Installation directories ####
 
+# Set the installation location of mddriver components.
+set(BIN_INSTALL_DIR         bin)
+set(LIB_INSTALL_DIR         lib)
+set(INCLUDE_INSTALL_DIR     include)
 
-# by default, we'll be installing mddriver in /some/standard/path/MDDriver
-#IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-#    SET(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}
-#        CACHE
-#        PATH
-#        "Install path prefix, prepended onto install directories."
-#        FORCE
-#        )
-#ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+set(MDDRIVER_INSTALL_SHARE_DIR share)
 
-SET(INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/include)
-SET(LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/lib)
-SET(MODULE_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/bin)
-SET(CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/cmake)
-SET(DOC_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/doc)
-SET(PLUGINS_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/plugins)
+set(DOC_INSTALL_DIR         ${MDDRIVER_INSTALL_SHARE_DIR}/doc)
+set(PLUGINS_INSTALL_DIR     ${MDDRIVER_INSTALL_SHARE_DIR}/plugins)
+set(CMAKEMOD_INSTALL_DIR    ${MDDRIVER_INSTALL_SHARE_DIR}/cmake)
 
 
-CONFIGURE_FILE(config/${CMAKE_PROJECT_NAME}-config.sh.in ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.sh @ONLY)
-CONFIGURE_FILE(config/${CMAKE_PROJECT_NAME}-config.csh.in ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.csh @ONLY)
-CONFIGURE_FILE(config/${CMAKE_PROJECT_NAME}Config.cmake.in ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake @ONLY)
 
-SUBDIRS(protocol adapters)
-INSTALL(DIRECTORY adapters
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}
-    PATTERN .svn EXCLUDE)
-INSTALL(FILES README.md LICENSE.txt
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME})
+#################
+### PROTOCOL  ###
+#################
 
-OPTION (UNITYMOL_PLUGIN "Install UnityMol Plugin as .dll for Windows, .bundle for MacOSX, .so for Linux" OFF)
+add_subdirectory(protocol)
 
-# install configured files
-INSTALL(FILES ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.sh ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.csh
-    DESTINATION ${MODULE_DIR}
-    PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-    OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-INSTALL(FILES ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake DESTINATION ${CMAKE_DIR})
+#################
+### PLUGINS  ####
+#################
+
+if(BUILD_PLUGINS)
+    add_subdirectory(plugins)
+endif()
+
+#####################
+### EXAMPLE TOOL ####
+#####################
+
+if(INSTALL_EXAMPLE_TOOL)
+    install(DIRECTORY example_tool
+            DESTINATION ${MDDRIVER_INSTALL_SHARE_DIR}
+            )
+endif()
+
+###################
+### PYTHON LIB ####
+###################
+
+if(INSTALL_PYTHON_LIB)
+    install(DIRECTORY protocol/python
+            DESTINATION ${MDDRIVER_INSTALL_SHARE_DIR}
+            )
+endif()
+
+###################
+# Configure files #
+###################
+
+configure_file(${PROJECT_SOURCE_DIR}/config/MDDriver-config.sh.in
+    ${PROJECT_BINARY_DIR}/MDDriver-config.sh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/config/MDDriver-config.csh.in
+    ${PROJECT_BINARY_DIR}/MDDriver-config.csh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/config/MDDriverConfig.cmake.in
+    ${PROJECT_BINARY_DIR}/MDDriverConfig.cmake @ONLY)
 
 
-MESSAGE(STATUS "Please source ${MODULE_DIR}/MDDriver-config.sh or ${MODULE_DIR}/MDDriver-config.sh including environment variables for MDDRiver after compiling and installing")
+# install configure files
+install(FILES
+    ${PROJECT_BINARY_DIR}/MDDriver-config.sh
+    ${PROJECT_BINARY_DIR}/MDDriver-config.csh
+    DESTINATION ${BIN_INSTALL_DIR}
+)
+
+# install cmake file
+install(FILES
+    ${PROJECT_BINARY_DIR}/MDDriverConfig.cmake
+    DESTINATION ${CMAKEMOD_INSTALL_DIR}
+)
+
+
+MESSAGE(STATUS "Please source ${CMAKEMOD_INSTALL_DIR}/MDDriver-config.sh or ${CMAKEMOD_INSTALL_DIR}/MDDriver-config.sh including environment variables for MDDRiver after compiling and installing")
