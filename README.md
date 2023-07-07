@@ -42,6 +42,10 @@ cmake --build build
 cmake --install
 ```
 
+By default, the UnityMol plugin is compiled. This can be deactivated with `-DBUILD_PLUGINS=OFF`.
+
+By default, the example tool in C++ and the python library is not installed. This can be activated with `-DINSTALL_EXAMPLE_TOOL=ON` and `-DINSTALL_PYTHON_LIB=ON`.
+
 ### Test
 
 You can test the protocol by lauching 2 executables, one in each console:
