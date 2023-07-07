@@ -26,4 +26,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: UnityMol-Plugin
-          path: build/plugins/*Unity_MDDriver*
+          path: |
+            build/plugins/libUnity_MDDriver.*
+            build/plugins/Debug/Unity_MDDriver.dll
