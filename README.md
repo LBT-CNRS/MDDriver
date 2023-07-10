@@ -69,6 +69,12 @@ Usually, MDDriver is used as a library for another code.
 **For UnityMol:** Copy/paste the library file into the `Plugins` folder of the UnityMol build.
 
 
+### Artifacts
+
+During CI, the UnityMol Plugin is build for all platforms automatically and stored in the artifacts.
+**You can find the latest artifacts in the [GitHub Actions](https://github.com/LBT-CNRS/MDDriver/actions) page**.
+
+
 ## References
 
 [1]: Lanrezac, A.; Laurent, B.; Santuz, H.; Férey, N.; Baaden, M. Fast and Interactive Positioning of Proteins within Membranes. Algorithms 2022, 15, 415. https://doi.org/10.3390/a15110415
