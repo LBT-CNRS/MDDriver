@@ -38,7 +38,9 @@ cmake -S . -B build -DCMAKE_INSTALL_PREFIX:PATH=/path/to/mddriver/installation -
 
 # On Mac/Linux
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX:PATH=/path/to/mddriver/installation
-cmake --build build
+
+# Compilation
+cmake --build build --config Release
 cmake --install
 ```
 
