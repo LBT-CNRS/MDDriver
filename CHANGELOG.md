@@ -1,5 +1,16 @@
 **Dev**
 
+**1.1**
+
+   - Declare and add `MDDriver_sendCustomInt/Float` in UnityMol-MDDriver API 
+   - Add new `IIMD_get_nb_custom_int/float` dedicated function for `MDDriver_getNbCustomInt/Float`
+   - Modify `MDDriver_getCustomInt/Float` to return actual size of recieved data
+   - Add `IMDCustomData` structure for custom data 
+     - **TO DO: Use this structure as an argument in associated custom data functions**
+   - Show 'no force' warning only for `IMDmsg` log level > 0
+   - In `IIMD_treatprotocol`, activate `vmd_new_custom_float` flag when recieve custom data in server side & fix `vmd_custom_int` allocation
+   - Adapt `IIMD_send_custom_int/float` to send custom data from client side to server
+   - Update `clienttest.c` & `servertest.c` for custom data
 
 **1.0**
 
