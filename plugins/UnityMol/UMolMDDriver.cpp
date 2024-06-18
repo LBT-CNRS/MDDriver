@@ -100,6 +100,8 @@ API int MDDriver_getNbCustomInt(MDDriverAdapter *mddinstance);
 API int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *verts, int nbParticles);
 API int MDDriver_getCustomFloat(MDDriverAdapter *mddinstance, char * datanamefloat, float *customfloat, int nbfloat);
 API int MDDriver_getCustomInt(MDDriverAdapter *mddinstance, char * datanameint, int * customint, int nbint);
+API void MDDriver_sendCustomInt(MDDriverAdapter *mddinstance, int nbint, const char *datanameint, int *customint);
+API void MDDriver_sendCustomFloat(MDDriverAdapter *mddinstance, int nbfloat, const char *datanamefloat, float *customfloat);
 API void MDDriver_pause(MDDriverAdapter *mddinstance);
 API void MDDriver_play(MDDriverAdapter *mddinstance);
 API void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float *forceslist);
@@ -205,14 +207,14 @@ int MDDriver_getNbParticles(MDDriverAdapter *mddinstance) {
 
 int MDDriver_getNbCustomFloat(MDDriverAdapter *mddinstance) {
     if (mddinstance->N_floats <= 0) {
-        IIMD_get_custom_float( &(mddinstance->datanamefloat), &(mddinstance->N_floats), (float **) & (mddinstance->customfloat) );
+        IIMD_get_nb_custom_float(&(mddinstance->N_floats));
     }
     return mddinstance->N_floats;
 }
 
 int MDDriver_getNbCustomInt(MDDriverAdapter *mddinstance) {
     if (mddinstance->N_ints <= 0) {
-        IIMD_get_custom_int( &(mddinstance->datanameint), &(mddinstance->N_ints), (int **) & (mddinstance->customint) );
+        IIMD_get_nb_custom_int(&(mddinstance->N_ints));
     }
     return mddinstance->N_ints;
 }
@@ -234,20 +236,26 @@ int MDDriver_getPositions(MDDriverAdapter *mddinstance, float *coordinates, int 
 
 
 int MDDriver_getCustomFloat(MDDriverAdapter *mddinstance, char * datanamefloat, float *customfloat, int nbfloat) {
-    IIMD_get_custom_float(&(mddinstance->datanamefloat),  &(mddinstance->N_floats), (float **) & (mddinstance->customfloat) );
+    int rc = IIMD_get_custom_float(&(mddinstance->datanamefloat),  &(mddinstance->N_floats), (float **) & (mddinstance->customfloat) );
     memcpy(customfloat, mddinstance->customfloat, nbfloat * sizeof(float));
     memcpy(datanamefloat, mddinstance->datanamefloat, 8 * sizeof(char));
-    return nbfloat;
+    return rc;
 }
 
 int MDDriver_getCustomInt(MDDriverAdapter *mddinstance, char * datanameint, int * customint, int nbint) {
-  IIMD_get_custom_float(&(mddinstance->datanameint) , &(mddinstance->N_ints), (float **) & (mddinstance->customint) );
+  int rc = IIMD_get_custom_int(&(mddinstance->datanameint) , &(mddinstance->N_ints), (int **) & (mddinstance->customint) );
   memcpy(customint, mddinstance->customint, nbint * sizeof(int));
   memcpy(datanameint, mddinstance->datanameint, 8 * sizeof(char));
-  return nbint;
+  return rc;
 }
 
+void MDDriver_sendCustomInt(MDDriverAdapter *mddinstance, int nbint, const char *datanameint, int *customint) {
+    IIMD_send_custom_int(datanameint, &nbint, customint);
+}
 
+void MDDriver_sendCustomFloat(MDDriverAdapter *mddinstance, int nbfloat, const char *datanamefloat, float *customfloat) {
+    IIMD_send_custom_float(datanamefloat, &nbfloat, customfloat);
+}
 
 void MDDriver_setForces(MDDriverAdapter *mddinstance, int nbforces, int *atomslist, float * forceslist) {
     if (mddinstance->nb_forces != nbforces || mddinstance->forces_list == NULL) {

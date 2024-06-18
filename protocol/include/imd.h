@@ -125,6 +125,12 @@ typedef struct
 	float sizecellz;     //!< Size of the cell on z axis
 } IMDGrid;
 
+typedef struct
+{
+    char *dataname ;
+    int nb;
+    void *data;
+} IMDCustomData;
 
 
 // Swap little <-> big endian

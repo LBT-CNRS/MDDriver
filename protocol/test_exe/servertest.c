@@ -85,23 +85,12 @@
 //
 #define CURRCALC 1
 
-float custom_float[5] =
-{
-1.0,
-2.0,
-3.0,
-4.0,
-5.0
-};
+int nb = 5;
+int intdata[5] = {1, 2, 3, 4, 5};
+float floatdata[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
 
-int custom_int[5] =
-{
-1,
-2,
-3,
-4,
-5
-};
+IMDCustomData float_send, int_send;
+IMDCustomData float_get, int_get;
 
 // Example coordinates for deca-alanine, 104 atoms, use test.pdb for visualization in VMD
 float coords[N][NDIM] =
@@ -228,8 +217,7 @@ const double NmToAngstrom     = 10.0;
 
 // Communication buffer for energies
 static IMDEnergies energies;
-static int nbint;
-static int nbfloat;
+
 // Communication buffer for grid
 static IMDGrid grid;
 
@@ -392,48 +380,44 @@ void myimd_send_grid(int step_)
 // Send custom float
 void myimd_send_float(int step_)
 {
-
-	// should we print the grid to the log file?
 	if ( MYIMDdebug )
 	{
-
 		fprintf(MYIMDlog, "MYMDD > \n");
-		fprintf(MYIMDlog, "MYMDD > Send custom float (Time step=%d)\n" , step_);
+		fprintf(MYIMDlog, "MYMDD > Send float array (Time step=%d)\n" , step_);
 		fprintf(MYIMDlog, "MYMDD > ================================\n");
 		fprintf(MYIMDlog, "MYMDD >   \n");
-		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM custom float  \n");
+		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM float array %s \n", float_send.dataname);
 		fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
-		fprintf(MYIMDlog, "MYMDD >   Custom float %s %f, %f, %f, %f, %f\n", "myfloat" , custom_float[0],custom_float[1],custom_float[2], custom_float[3], custom_float[4]);
+		for (unsigned j = 0; j < float_send.nb; j++)
+		{
+			fprintf(MYIMDlog, "MYMDD > float array[%d] = %f\n", j, ((float*)(float_send.data))[j]);
+		}
 		fprintf(MYIMDlog, "MYMDD > \n");
 	}
 
-	// SEND custom float
-	nbfloat = 5;
-	IIMD_send_custom_float("myfloat", &nbfloat, custom_float);
+	IIMD_send_custom_float(float_send.dataname, &float_send.nb, float_send.data);
 	// ..whatever you want, for example unit conversion
 }
 
 // Send custom float
 void myimd_send_int(int step_)
 {
-
-	// should we print the grid to the log file?
 	if ( MYIMDdebug )
 	{
-
 		fprintf(MYIMDlog, "MYMDD > \n");
-		fprintf(MYIMDlog, "MYMDD > Send custom int (Time step=%d)\n" , step_);
+		fprintf(MYIMDlog, "MYMDD > Send int array (Time step=%d)\n" , step_);
 		fprintf(MYIMDlog, "MYMDD > ================================\n");
 		fprintf(MYIMDlog, "MYMDD >   \n");
-		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM custom int  \n");
+		fprintf(MYIMDlog, "MYMDD >   MYPROGRAM int array %s \n", int_send.dataname);
 		fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
-		fprintf(MYIMDlog, "MYMDD >   Custom int %s %d, %d, %d, %d, %d\n", "myint" , custom_int[0],custom_int[1],custom_int[2], custom_int[3], custom_int[4]);
+		for (unsigned j = 0; j < int_send.nb; j++)
+		{
+			fprintf(MYIMDlog, "MYMDD > int array[%d] = %d\n", j, ((int*)(int_send.data))[j]);
+		}
 		fprintf(MYIMDlog, "MYMDD > \n");
 	}
 
-	// SEND custom int
-	nbint = 5;
-	IIMD_send_custom_int("myint", &nbint, custom_int);
+	IIMD_send_custom_int(int_send.dataname, &int_send.nb, int_send.data);
 	// ..whatever you want, for example unit conversion
 }
 
@@ -505,6 +489,49 @@ void myimd_ext_forces( )
 	}
 }
 
+void myimd_get_custom_float(int step_)
+{
+	if ( IIMD_get_custom_float(&float_get.dataname,  &float_get.nb, (float**)&float_get.data)  )
+	{
+		if ( MYIMDdebug )
+		{
+			fprintf(MYIMDlog, "MYMDD > \n");
+			fprintf(MYIMDlog, "MYMDD > Receive float array (Time step=%d)\n" , step_);
+			fprintf(MYIMDlog, "MYMDD > ================================\n");
+			fprintf(MYIMDlog, "MYMDD >   \n");
+			fprintf(MYIMDlog, "MYMDD >   MYPROGRAM float array %s \n", float_get.dataname);
+			fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
+			for (unsigned j = 0; j < float_get.nb; j++)
+			{
+				fprintf(MYIMDlog, "MYMDD > float array[%d] = %f\n", j, ((float*)(float_get.data))[j]);
+			}
+			fprintf(MYIMDlog, "MYMDD > \n");
+		}
+	}
+}
+
+void myimd_get_custom_int(int step_)
+{
+	if ( IIMD_get_custom_int(&int_get.dataname,  &int_get.nb, (int**)&int_get.data)  )
+	{
+		if ( MYIMDdebug )
+		{
+			fprintf(MYIMDlog, "MYMDD > \n");
+			fprintf(MYIMDlog, "MYMDD > Receive int array (Time step=%d)\n" , step_);
+			fprintf(MYIMDlog, "MYMDD > ================================\n");
+			fprintf(MYIMDlog, "MYMDD >   \n");
+			fprintf(MYIMDlog, "MYMDD >   MYPROGRAM int array %s \n", int_get.dataname);
+			fprintf(MYIMDlog, "MYMDD >   ------------------------------------------ \n");
+			for (unsigned j = 0; j < int_get.nb; j++)
+			{
+				fprintf(MYIMDlog, "MYMDD > int array[%d] = %d\n", j, ((int*)(int_get.data))[j]);
+			}
+			fprintf(MYIMDlog, "MYMDD > \n");
+		}
+		
+	}
+}
+
 
 // -----------------------------------------------------------
 // THE TWO FUNCTIONS BELOW ARE FOR OUR FAKE CALCULATION MODULE
@@ -566,6 +593,19 @@ int main()
 	int       n = N;
 	float     tmpcoords[N][NDIM];
 	int i = 0;
+
+	// cfloSC : custom float Server Client
+	float_send.dataname="cfloSC";
+	float_send.nb=nb;
+	float_send.data=&floatdata;
+
+	int_send.dataname="cintSC";
+	int_send.nb=nb;
+	int_send.data=&intdata;
+
+	float_get.dataname = (char *) malloc(sizeof(char)*8);
+	int_get.dataname = (char *) malloc(sizeof(char)*8);
+
 	// initialize the coordinate array
 	init_coords(tmpcoords);
 
@@ -588,6 +628,8 @@ int main()
 			myimd_send_float(i);          // send float data
 			myimd_send_int(i);          // send int data
 			myimd_ext_forces();              // receive VMD's forces
+			myimd_get_custom_float(i);    // get float data
+			myimd_get_custom_int(i);      // get int data
 		}
 		// Treats extra events
 		switch ( imd_event )

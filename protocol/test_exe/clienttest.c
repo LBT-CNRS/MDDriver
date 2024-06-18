@@ -141,14 +141,18 @@ int main()
     int   atoms_list[N_FORCE];//Force
     float forces_list[N_FORCE*3];
 
-    int nbfloat;
-    float * customfloat;
-    char * datanamefloat=(char *) malloc(sizeof(char)*8);
+    int nb = 5;
+    int intdata[5] = {6, 7, 8, 9, 10};
+    float floatdata[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
 
-    int nbint;
-    int * customint;
-    char * datanameint=(char *) malloc(sizeof(char)*8);
+    // cintCS : custom int Client Server
+    IMDCustomData float_send = {.dataname="cfloCS", .nb=nb, .data=&floatdata};
+    IMDCustomData int_send = {.dataname="cintCS", .nb=nb, .data=&intdata};
 
+    IMDCustomData float_get, int_get;
+    float_get.dataname = (char *) malloc(sizeof(char)*8);
+	int_get.dataname = (char *) malloc(sizeof(char)*8);
+    
     int cont   = 1;                     // Main loop control
     int ffreq  = 10;
     int i;
@@ -266,36 +270,36 @@ int main()
                 }
             }
 
-            if ( IIMD_get_custom_float(&datanamefloat,  &nbfloat, (float **) &customfloat) )
+            if ( IIMD_get_custom_float(&float_get.dataname,  &float_get.nb, (float**)&float_get.data) )
             {
-                if (log)
+                
                 {
                   fprintf(IMDlog, "MYMDD > \n");
                   fprintf(IMDlog, "MYMDD > Receive float array (Time step=%d)\n" , i);
                   fprintf(IMDlog, "MYMDD > ================================\n");
                   fprintf(IMDlog, "MYMDD >   \n");
-                  fprintf(IMDlog, "MYMDD >   MYPROGRAM float array %s \n", datanamefloat);
+                  fprintf(IMDlog, "MYMDD >   MYPROGRAM float array %s \n", float_get.dataname);
                   fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
-                  for (unsigned j = 0; j < nbfloat; j++)
+                  for (unsigned j = 0; j < float_get.nb; j++)
                     {
-                      fprintf(IMDlog, "MYMDD > float array[%d] = %f\n", j, customfloat[j]);
+                      fprintf(IMDlog, "MYMDD > float array[%d] = %f\n", j, ((float*)(float_get.data))[j]);
                     }
                   fprintf(IMDlog, "MYMDD > \n");
                 }
             }
-            if ( IIMD_get_custom_int(&datanameint,  &nbint, (int **) &customint)  )
+            if ( IIMD_get_custom_int(&int_get.dataname,  &int_get.nb, (int**)&int_get.data)  )
             {
-                if (log)
+                
                 {
                   fprintf(IMDlog, "MYMDD > \n");
                   fprintf(IMDlog, "MYMDD > Receive int array (Time step=%d)\n" , i);
                   fprintf(IMDlog, "MYMDD > ================================\n");
                   fprintf(IMDlog, "MYMDD >   \n");
-                  fprintf(IMDlog, "MYMDD >   MYPROGRAM int array %s \n", datanameint);
+                  fprintf(IMDlog, "MYMDD >   MYPROGRAM int array %s \n", int_get.dataname);
                   fprintf(IMDlog, "MYMDD >   ------------------------------------------ \n");
-                  for (unsigned j = 0; j < nbint; j++)
+                  for (unsigned j = 0; j < int_get.nb; j++)
                     {
-                      fprintf(IMDlog, "MYMDD > int array[%d] = %d\n", j, customint[j]);
+                      fprintf(IMDlog, "MYMDD > int array[%d] = %d\n", j, ((int*)(int_get.data))[j]);
                     }
                   fprintf(IMDlog, "MYMDD > \n");
                 }
@@ -307,6 +311,9 @@ int main()
             {
                 IIMD_send_forces ( &N_forces, atoms_list, forces_list );
             }
+
+            IIMD_send_custom_float(float_send.dataname, &float_send.nb, float_send.data);
+            IIMD_send_custom_int(int_send.dataname, &int_send.nb, int_send.data);
         }
 #if !defined(_WIN32)
         // Deals with keyboard events
