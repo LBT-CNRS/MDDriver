@@ -206,16 +206,12 @@ int MDDriver_getNbParticles(MDDriverAdapter *mddinstance) {
 }
 
 int MDDriver_getNbCustomFloat(MDDriverAdapter *mddinstance) {
-    if (mddinstance->N_floats <= 0) {
-        IIMD_get_nb_custom_float(&(mddinstance->N_floats));
-    }
+    IIMD_get_nb_custom_float(&(mddinstance->N_floats));
     return mddinstance->N_floats;
 }
 
 int MDDriver_getNbCustomInt(MDDriverAdapter *mddinstance) {
-    if (mddinstance->N_ints <= 0) {
-        IIMD_get_nb_custom_int(&(mddinstance->N_ints));
-    }
+    IIMD_get_nb_custom_int(&(mddinstance->N_ints));
     return mddinstance->N_ints;
 }
 
