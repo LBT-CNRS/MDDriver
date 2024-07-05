@@ -793,9 +793,9 @@ FILE *IIMD_init( const char  *hostname,     imd_int32   *mode,  imd_int32   *IMD
 		IMDlog = stderr;
 	}
 	else if (strcmp(IMDlogname_, "stdout") == 0)
-    {
-        IMDlog = stdout;
-    }
+	{
+		IMDlog = stdout;
+	}
 	else
 	{
 		IMDlog = fopen ( IMDlogname_, "w");
