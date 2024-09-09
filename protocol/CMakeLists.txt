@@ -38,6 +38,3 @@ install(FILES include/imd.h include/imd_interface.h include/vmdsock.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
 )
 
-# install doc
-INSTALL(FILES Doxyfile DESTINATION ${DOC_INSTALL_DIR})
-INSTALL(DIRECTORY doc DESTINATION ${DOC_INSTALL_DIR} USE_SOURCE_PERMISSIONS)
