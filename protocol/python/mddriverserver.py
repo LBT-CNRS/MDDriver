@@ -2,7 +2,7 @@
 from time import *
 from mddriver import *
 
-port=3000
+port=8888
 message=2
 wait=1
 filenameserver="server.log"

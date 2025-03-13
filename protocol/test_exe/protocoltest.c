@@ -92,7 +92,7 @@ static       IMDGrid grid; // Communication buffer for energies
 
 int nstximd              = 0;
 int myimd_wait           = 1;
-int myimd_port           = -3000; // If the value is negative, we will print debug output!
+int myimd_port           = -8888; // If the value is negative, we will print debug output!
 
 void myimd_init( )
 {	// --- MDD Initialization function ---

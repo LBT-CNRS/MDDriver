@@ -17,13 +17,13 @@ void usage()
 	cout<<"mddriverconstraint"<<endl;
 	cout<<"\tOptions : "<<endl;
 	cout<<"\t\t[-host hostname] : default = localhost"<<endl;
-	cout<<"\t\t[-port port] : default = 3000"<<endl;
+	cout<<"\t\t[-port port] : default = 8888"<<endl;
 	exit(1);
 	}
 
 int main( int argc, char *argv[] )
 	{
-	unsigned port=3000;
+	unsigned port=8888;
 	char hostname[HOSTMAXSIZE]="localhost";
 	unsigned minimaloptionok=false;
 

@@ -30,7 +30,7 @@ static PyObject * mddriver_client(PyObject *self, PyObject *args)
 	char * filename;
 	int mode=0;
 	int wait=0;
-	int port=3000;
+	int port=8888;
 	int message=0;
 	char * hostname;
 	if (!PyArg_ParseTuple(args, "siis:mddriver_client", &hostname, &port, &message, &filename))
@@ -47,7 +47,7 @@ static PyObject * mddriver_server(PyObject *self, PyObject *args)
 	char * filename;
 	int mode=1;
 	int wait=0;
-	int port=3000;
+	int port=8888;
 	int message=0;
 	if (!PyArg_ParseTuple(args, "iiis:mddriver_server",&port,&wait,&message,&filename))
 		{
