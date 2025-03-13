@@ -226,7 +226,7 @@ int myimd_wait           = 1;
 int myimd_log           = 2;
 
 // If the value is negative, we will print debug output!
-int myimd_port           = 3000;
+int myimd_port           = 8888;
 
 
 // MDD Initialization function

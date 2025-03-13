@@ -102,7 +102,7 @@ static int IMDwait = 0;
 static imd_int32 IMDignore = 0;
 
 // Connection port number
-static imd_int32 IMDport = 3000 ;
+static imd_int32 IMDport = 8888 ;
 
 // Message level
 //   0 -> Only error messages
@@ -837,7 +837,7 @@ FILE *IIMD_init( const char  *hostname,     imd_int32   *mode,  imd_int32   *IMD
 		if ( IMDport  <= 1024 )
 		{
 			fprintf(IMDlog, "MDDriver >      Bad port number (using %d) \n", IMDport);
-			IMDport = 3000;
+			IMDport = 8888;
 		}
 
 		int newport = find_free_port(sock, hostname, IMDport);

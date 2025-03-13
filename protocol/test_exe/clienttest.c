@@ -91,7 +91,7 @@ typedef float t_coord[3];
 
 FILE *IMDlog;
 char IMDhostname[] = "localhost";
-int IMDport   = 3000;
+int IMDport   = 8888;
 int IMDmsg = 2;
 int IMDwait   = 0;                     // Connection configuration
 int IMDmode = 0; // 0 : client , 1 : server
