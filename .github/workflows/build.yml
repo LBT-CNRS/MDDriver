@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure
         run: cmake -S . -B build
@@ -23,7 +23,7 @@ jobs:
         run: cmake --build build
 
       - name: Archive UnityMol Plugin library
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: UnityMol-Plugin
           path: |
