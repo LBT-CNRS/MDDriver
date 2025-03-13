@@ -25,7 +25,7 @@ jobs:
       - name: Archive UnityMol Plugin library
         uses: actions/upload-artifact@v4
         with:
-          name: UnityMol-Plugin
+          name: UnityMol-Plugin-${{ matrix.os }}
           path: |
             build/plugins/libUnity_MDDriver.*
             build/plugins/Debug/Unity_MDDriver.dll
