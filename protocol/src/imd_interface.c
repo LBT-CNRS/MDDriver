@@ -1008,18 +1008,22 @@ void IIMD_send_energies(const IMDEnergies *energies)
 	if (IMDmsg >= 1)
 		fprintf( IMDlog, "MDDriver > ---- Entering in %s\n", __FUNCTION__);
 
+	// Server side: vmd_energies is only filled when receiving energies (client side),
+	// so keep the step being sent; the other log messages label themselves with it.
+	vmd_energies.tstep = energies->tstep;
+
 	if (IMDmsg >= 2)
 	{
 		fprintf(IMDlog, "MDDriver > \n");
-		fprintf(IMDlog, "MDDriver >      Sent energies (step %d) \n", vmd_energies.tstep);
+		fprintf(IMDlog, "MDDriver >      Sent energies (step %d) \n", energies->tstep);
 		fprintf(IMDlog, "MDDriver >      ------------------------------------------ \n");
 		fprintf(IMDlog, "MDDriver >      [Cal] for energies      \n" );
 		fprintf(IMDlog, "MDDriver >      [K] for the temperature \n" );
 		fprintf(IMDlog, "MDDriver >      [Bar] for pressure      \n" );
-		fprintf(IMDlog, "MDDriver >      Time step         [ ]   %12d\n",   vmd_energies.tstep);
-		fprintf(IMDlog, "MDDriver >      Temperature       [K]   %12.5e\n", vmd_energies.T);
+		fprintf(IMDlog, "MDDriver >      Time step         [ ]   %12d\n",   energies->tstep);
+		fprintf(IMDlog, "MDDriver >      Temperature       [K]   %12.5e\n", energies->T);
 		fprintf(IMDlog, "MDDriver >      Total E.          [Cal] %12.5e\n", energies->Etot);
-		fprintf(IMDlog, "MDDriver >      Bond E.           [Cal] %12.5e\n", vmd_energies.Ebond);
+		fprintf(IMDlog, "MDDriver >      Bond E.           [Cal] %12.5e\n", energies->Ebond);
 		fprintf(IMDlog, "MDDriver >      Angle E.          [Cal] %12.5e\n", energies->Eangle);
 		fprintf(IMDlog, "MDDriver >      Potential E.      [Cal] %12.5e\n", energies->Epot);
 		fprintf(IMDlog, "MDDriver >      Dihedrale E.      [Cal] %12.5e\n", energies->Edihe);
